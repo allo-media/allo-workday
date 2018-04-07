@@ -39,6 +39,7 @@ type Msg
     | HourInc Day
     | PickMonth Int
     | PickYear Int
+    | SetKind Day String
 
 
 init : Session -> ( Model, Cmd Msg )
@@ -87,6 +88,9 @@ update session msg ({ days } as model) =
         PickYear year ->
             { model | year = year, month = 1, days = calendar year |> refineMonth 1 } ! []
 
+        SetKind day kindString ->
+            { model | days = days |> setDayKind kindString day } ! []
+
 
 
 -- Views
@@ -94,7 +98,7 @@ update session msg ({ days } as model) =
 
 monthSelector : Model -> Html Msg
 monthSelector { year, month } =
-    div [ class "field" ]
+    div [ class "month-selector field" ]
         [ div [ class "select" ]
             [ select [ onInput (\v -> String.toInt v |> Result.withDefault 2018 |> PickYear) ]
                 ([ 2018, 2017 ]
@@ -123,9 +127,12 @@ monthSelector { year, month } =
 
 
 kindSelector : Day -> Html Msg
-kindSelector { kind } =
+kindSelector ({ kind } as day) =
     div [ class "select" ]
-        [ select [ disabled <| kindToString kind == "jf" ]
+        [ select
+            [ disabled <| kindToString kind == "jf"
+            , onInput (SetKind day)
+            ]
             [ option
                 [ value "cp"
                 , selected <| kindToString kind == "cp"
@@ -183,13 +190,13 @@ viewDay index ({ date, week, obs, kind } as day) =
                 _ ->
                     text ""
             , tr []
-                [ td [] [ dayOfWeek |> dayName |> text ]
-                , td [] [ date |> Date.day |> toString |> text ]
+                [ td [ class "text-cell" ] [ dayOfWeek |> dayName |> text ]
+                , td [ class "text-cell" ] [ date |> Date.day |> toString |> text ]
                 , td [] [ kindSelector day ]
-                , td []
-                    [ case kind of
-                        Workday hours ->
-                            div [ class "field has-addons" ]
+                , case kind of
+                    Workday hours ->
+                        td []
+                            [ div [ class "field has-addons" ]
                                 [ div [ class "control" ]
                                     [ input
                                         [ class "input has-text-centered"
@@ -207,10 +214,10 @@ viewDay index ({ date, week, obs, kind } as day) =
                                     [ button [ class "button", onClick (HourInc day) ] [ text "+" ]
                                     ]
                                 ]
+                            ]
 
-                        _ ->
-                            text "0"
-                    ]
+                    _ ->
+                        td [ class "text-cell" ] [ div [ class "zero-value" ] [ text "0" ] ]
                 , td []
                     [ input
                         [ class "input"
@@ -224,12 +231,23 @@ viewDay index ({ date, week, obs, kind } as day) =
             ]
 
 
+statsView : List Day -> Html Msg
+statsView days =
+    let
+        totalWorked =
+            computeTotalDays days
+    in
+        div []
+            [ h3 [] [ text <| toString totalWorked ++ " jours travaillés" ]
+            ]
+
+
 view : Session -> Model -> Html Msg
 view session model =
     div [ class "content" ]
         [ monthSelector model
         , h1 [] [ text <| monthName model.month ++ " " ++ toString model.year ]
-        , div [] [ h2 [] [ text <| toString (computeTotalDays model.days) ++ " jours travaillés" ] ]
+        , statsView model.days
         , table []
             ((thead []
                 [ th [] [ text "Jour" ]
@@ -322,7 +340,7 @@ calendar year =
                 )
 
 
-computeTotalDays : List Day -> Int
+computeTotalDays : List Day -> Float
 computeTotalDays days =
     (days
         |> List.map
@@ -335,8 +353,9 @@ computeTotalDays days =
                         0
             )
         |> List.sum
+        |> toFloat
     )
-        // 8
+        / 8
 
 
 coreMonthToInt : CoreDate.Month -> Int
@@ -506,6 +525,38 @@ refineMonth : Int -> List Day -> List Day
 refineMonth month days =
     days
         |> List.filter (\({ date } as wd) -> Date.month date == month)
+
+
+setDayKind : String -> Day -> List Day -> List Day
+setDayKind kindString day days =
+    days
+        |> List.map
+            (\d ->
+                if d == day then
+                    { d
+                        | kind =
+                            case kindString of
+                                "cp" ->
+                                    PaidVacation
+
+                                "jf" ->
+                                    PublicHoliday ""
+
+                                "rtt" ->
+                                    Rtt
+
+                                "ml" ->
+                                    SickLeave
+
+                                "jt" ->
+                                    Workday 8
+
+                                _ ->
+                                    Debug.crash <| "unsupported kind " ++ kindString
+                    }
+                else
+                    d
+            )
 
 
 timestr : Int -> Int -> Int -> String
