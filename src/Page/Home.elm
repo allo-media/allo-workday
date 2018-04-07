@@ -10,17 +10,24 @@ import Task
 import Time.Date as Date exposing (Date)
 
 
-type alias Workday =
+type alias Day =
     { date : Date
-    , hours : Int
     , week : Int
     , obs : String
-    , enabled : Bool
+    , kind : DayKind
     }
 
 
+type DayKind
+    = PaidVacation
+    | PublicHoliday String
+    | Rtt
+    | SickLeave
+    | Workday Int
+
+
 type alias Model =
-    { days : List Workday
+    { days : List Day
     , year : Int
     , month : Int
     }
@@ -28,6 +35,8 @@ type alias Model =
 
 type Msg
     = DateReceived CoreDate.Date
+    | HourDec Day
+    | HourInc Day
     | PickMonth Int
     | PickYear Int
 
@@ -66,6 +75,12 @@ update session msg ({ days } as model) =
                 }
                     ! []
 
+        HourDec day ->
+            { model | days = days |> addWordayHours -1 day } ! []
+
+        HourInc day ->
+            { model | days = days |> addWordayHours 1 day } ! []
+
         PickMonth month ->
             { model | month = month, days = calendar model.year |> refineMonth month } ! []
 
@@ -77,55 +92,8 @@ update session msg ({ days } as model) =
 -- Views
 
 
-viewDay : Int -> Workday -> Html Msg
-viewDay index { date, week, hours, obs, enabled } =
-    let
-        day =
-            Date.weekday date
-    in
-        tbody []
-            [ case ( Date.day date, day ) of
-                ( 1, _ ) ->
-                    tr []
-                        [ th [ colspan 4, class "has-text-centered" ]
-                            [ h3 [] [ date |> Date.month |> monthName |> text ] ]
-                        ]
-
-                ( _, Date.Mon ) ->
-                    tr []
-                        [ td [ colspan 4, class "has-text-centered" ]
-                            [ em [] [ text <| "Semaine " ++ toString week ] ]
-                        ]
-
-                _ ->
-                    text ""
-            , tr []
-                [ td [] [ date |> Date.weekday |> dayName |> text ]
-                , td [] [ date |> Date.day |> toString |> text ]
-                , td []
-                    [ input
-                        [ class "input"
-                        , type_ "number"
-                        , value <| toString hours
-                        , disabled <| not enabled
-                        ]
-                        []
-                    ]
-                , td []
-                    [ input
-                        [ class "input"
-                        , type_ "text"
-                        , placeholder "Observations"
-                        , value obs
-                        ]
-                        []
-                    ]
-                ]
-            ]
-
-
-selectors : Model -> Html Msg
-selectors { year, month } =
+monthSelector : Model -> Html Msg
+monthSelector { year, month } =
     div [ class "field" ]
         [ div [ class "select" ]
             [ select [ onInput (\v -> String.toInt v |> Result.withDefault 2018 |> PickYear) ]
@@ -154,16 +122,93 @@ selectors { year, month } =
         ]
 
 
+kindSelector : Day -> Html Msg
+kindSelector { kind } =
+    div [ class "select" ]
+        [ select []
+            [ option [] [ text "Congé payé" ]
+            , option [] [ text "Jour férié" ]
+            , option [] [ text "Jour travaillé" ]
+            , option [] [ text "Maladie" ]
+            , option [] [ text "RTT" ]
+            ]
+        ]
+
+
+viewDay : Int -> Day -> Html Msg
+viewDay index ({ date, week, obs, kind } as day) =
+    let
+        dayOfWeek =
+            Date.weekday date
+    in
+        tbody []
+            [ case ( Date.day date, dayOfWeek ) of
+                ( 1, _ ) ->
+                    tr []
+                        [ th [ colspan 5, class "has-text-centered" ]
+                            [ h3 [] [ date |> Date.month |> monthName |> text ] ]
+                        ]
+
+                ( _, Date.Mon ) ->
+                    tr []
+                        [ td [ colspan 5, class "has-text-centered" ]
+                            [ em [] [ text <| "Semaine " ++ toString week ] ]
+                        ]
+
+                _ ->
+                    text ""
+            , tr []
+                [ td [] [ dayOfWeek |> dayName |> text ]
+                , td [] [ date |> Date.day |> toString |> text ]
+                , td [] [ kindSelector day ]
+                , td []
+                    [ case kind of
+                        Workday hours ->
+                            div [ class "field has-addons" ]
+                                [ div [ class "control" ]
+                                    [ input
+                                        [ class "input has-text-centered"
+                                        , type_ "number"
+                                        , value <| toString hours
+                                        , readonly True
+                                        ]
+                                        []
+                                    ]
+                                , div [ class "control" ]
+                                    [ button [ class "button", onClick (HourDec day) ] [ text "-" ]
+                                    ]
+                                , div [ class "control" ]
+                                    [ button [ class "button", onClick (HourInc day) ] [ text "+" ]
+                                    ]
+                                ]
+
+                        _ ->
+                            text "0"
+                    ]
+                , td []
+                    [ input
+                        [ class "input"
+                        , type_ "text"
+                        , placeholder "Observations"
+                        , value obs
+                        ]
+                        []
+                    ]
+                ]
+            ]
+
+
 view : Session -> Model -> Html Msg
 view session model =
     div [ class "content" ]
-        [ selectors model
+        [ monthSelector model
         , h1 [] [ text <| monthName model.month ++ " " ++ toString model.year ]
         , div [] [ h2 [] [ text <| toString (computeTotalDays model.days) ++ " jours travaillés" ] ]
         , table []
             ((thead []
                 [ th [] [ text "Jour" ]
                 , th [] [ text "Date" ]
+                , th [] [ text "Type" ]
                 , th [] [ text "Heures" ]
                 , th [] [ text "Observation" ]
                 ]
@@ -177,7 +222,36 @@ view session model =
 -- Utils
 
 
-calendar : Int -> List Workday
+addWordayHours : Int -> Day -> List Day -> List Day
+addWordayHours toAdd day days =
+    case day.kind of
+        Workday hours ->
+            let
+                testHours =
+                    hours + toAdd
+
+                newHours =
+                    if testHours < 0 then
+                        0
+                    else if testHours > 8 then
+                        8
+                    else
+                        testHours
+            in
+                days
+                    |> List.map
+                        (\d ->
+                            if d == day then
+                                { d | kind = Workday newHours }
+                            else
+                                d
+                        )
+
+        _ ->
+            days
+
+
+calendar : Int -> List Day
 calendar year =
     let
         firstDay =
@@ -192,28 +266,27 @@ calendar year =
         yearOffdays =
             Dict.get year offdays |> Maybe.withDefault (Dict.fromList [])
 
-        createWorkday d =
+        createDay d =
             let
                 date =
                     firstDay |> Date.addDays d
 
-                ( obs, enabled, hours ) =
+                ( obs, kind ) =
                     case Dict.get (Date.toISO8601 date) yearOffdays of
                         Just offdayName ->
-                            ( offdayName, False, 0 )
+                            ( offdayName, PublicHoliday offdayName )
 
                         Nothing ->
-                            ( "", True, 8 )
+                            ( "", Workday 8 )
             in
                 { date = date
-                , hours = hours
                 , week = (d // 7) + weekOffset
                 , obs = obs
-                , enabled = enabled
+                , kind = kind
                 }
     in
         List.range 0 364
-            |> List.map createWorkday
+            |> List.map createDay
             |> List.filter
                 (\{ date } ->
                     Date.weekday date
@@ -223,9 +296,21 @@ calendar year =
                 )
 
 
-computeTotalDays : List Workday -> Int
+computeTotalDays : List Day -> Int
 computeTotalDays days =
-    (days |> List.map .hours |> List.sum) // 8
+    (days
+        |> List.map
+            (\{ kind } ->
+                case kind of
+                    Workday hours ->
+                        hours
+
+                    _ ->
+                        0
+            )
+        |> List.sum
+    )
+        // 8
 
 
 coreMonthToInt : CoreDate.Month -> Int
@@ -372,7 +457,7 @@ offdays =
         ]
 
 
-refineMonth : Int -> List Workday -> List Workday
+refineMonth : Int -> List Day -> List Day
 refineMonth month days =
     days
         |> List.filter (\({ date } as wd) -> Date.month date == month)
