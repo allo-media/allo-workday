@@ -234,11 +234,31 @@ viewDay index ({ date, week, obs, kind } as day) =
 statsView : List Day -> Html Msg
 statsView days =
     let
+        totalPaidVacation =
+            computeTotalPaidVacation days
+
+        totalRtt =
+            computeTotalRtt days
+
+        totalSickLeave =
+            computeTotalSickLeave days
+
         totalWorked =
-            computeTotalDays days
+            computeTotalWorkedDays days
     in
-        div []
-            [ h3 [] [ text <| toString totalWorked ++ " jours travaillés" ]
+        table []
+            [ thead []
+                [ th [] [ text "Travaillés" ]
+                , th [] [ text "RTT" ]
+                , th [] [ text "Congés payés" ]
+                , th [] [ text "Maladie" ]
+                ]
+            , tbody []
+                [ td [] [ text <| toString totalWorked ++ "j" ]
+                , td [] [ text <| toString totalRtt ++ "j" ]
+                , td [] [ text <| toString totalPaidVacation ++ "j" ]
+                , td [] [ text <| toString totalSickLeave ++ "j" ]
+                ]
             ]
 
 
@@ -340,8 +360,56 @@ calendar year =
                 )
 
 
-computeTotalDays : List Day -> Float
-computeTotalDays days =
+computeTotalPaidVacation : List Day -> Int
+computeTotalPaidVacation days =
+    (days
+        |> List.map
+            (\{ kind } ->
+                case kind of
+                    PaidVacation ->
+                        1
+
+                    _ ->
+                        0
+            )
+        |> List.sum
+    )
+
+
+computeTotalRtt : List Day -> Int
+computeTotalRtt days =
+    (days
+        |> List.map
+            (\{ kind } ->
+                case kind of
+                    Rtt ->
+                        1
+
+                    _ ->
+                        0
+            )
+        |> List.sum
+    )
+
+
+computeTotalSickLeave : List Day -> Int
+computeTotalSickLeave days =
+    (days
+        |> List.map
+            (\{ kind } ->
+                case kind of
+                    SickLeave ->
+                        1
+
+                    _ ->
+                        0
+            )
+        |> List.sum
+    )
+
+
+computeTotalWorkedDays : List Day -> Float
+computeTotalWorkedDays days =
     (days
         |> List.map
             (\{ kind } ->

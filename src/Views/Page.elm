@@ -28,8 +28,7 @@ frame ({ activePage, session } as config) content =
             , ( "page-current-time", activePage == CurrentTime )
             ]
         ]
-        [ viewHeader config
-        , div [ class "page-content" ] [ content ]
+        [ div [ class "page-content" ] [ content ]
         ]
 
 
