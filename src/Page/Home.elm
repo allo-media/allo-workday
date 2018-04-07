@@ -125,12 +125,37 @@ monthSelector { year, month } =
 kindSelector : Day -> Html Msg
 kindSelector { kind } =
     div [ class "select" ]
-        [ select []
-            [ option [] [ text "Congé payé" ]
-            , option [] [ text "Jour férié" ]
-            , option [] [ text "Jour travaillé" ]
-            , option [] [ text "Maladie" ]
-            , option [] [ text "RTT" ]
+        [ select [ disabled <| kindToString kind == "jf" ]
+            [ option
+                [ value "cp"
+                , selected <| kindToString kind == "cp"
+                ]
+                [ text "Congé payé" ]
+            , case kind of
+                PublicHoliday _ ->
+                    option
+                        [ value "jf"
+                        , selected <| kindToString kind == "jf"
+                        ]
+                        [ text "Jour férié" ]
+
+                _ ->
+                    text ""
+            , option
+                [ value "jt"
+                , selected <| kindToString kind == "jt"
+                ]
+                [ text "Jour travaillé" ]
+            , option
+                [ value "ml"
+                , selected <| kindToString kind == "ml"
+                ]
+                [ text "Maladie" ]
+            , option
+                [ value "rtt"
+                , selected <| kindToString kind == "rtt"
+                ]
+                [ text "RTT" ]
             ]
         ]
 
@@ -168,6 +193,7 @@ viewDay index ({ date, week, obs, kind } as day) =
                                 [ div [ class "control" ]
                                     [ input
                                         [ class "input has-text-centered"
+                                        , style [ ( "width", "50px" ) ]
                                         , type_ "number"
                                         , value <| toString hours
                                         , readonly True
@@ -376,6 +402,25 @@ dayName day =
 
         Date.Sun ->
             "Dim"
+
+
+kindToString : DayKind -> String
+kindToString kind =
+    case kind of
+        PaidVacation ->
+            "cp"
+
+        PublicHoliday _ ->
+            "jf"
+
+        Rtt ->
+            "rtt"
+
+        SickLeave ->
+            "ml"
+
+        Workday _ ->
+            "jt"
 
 
 monthName : Int -> String
