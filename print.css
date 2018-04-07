@@ -30,4 +30,19 @@ button {
 
 input, select {
   border: none;
+  font-family: Ubuntu;
+  font-size: 1em;
+}
+
+::-webkit-input-placeholder {
+  color: transparent;
+}
+:-moz-placeholder {
+  color: transparent;
+}
+::-moz-placeholder {
+  color: transparent;
+}
+:-ms-input-placeholder {
+  color: transparent;
 }
