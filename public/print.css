@@ -1,5 +1,7 @@
 body {
   font-family: Ubuntu;
+  margin: 0 1em;
+  padding: 0;
 }
 
 .header {
@@ -16,11 +18,12 @@ table {
   max-width: 1024px;
   border-collapse: collapse;
   border-spacing: 0;
+  margin-bottom: 1em;
 }
 
 td {
   border: 1px solid #999;
-  padding: 5px;
+  padding: 3px;
   font-size: 1em;
 }
 
@@ -32,6 +35,23 @@ input, select {
   border: none;
   font-family: Ubuntu;
   font-size: 1em;
+}
+
+.name {
+  font-weight: bold;
+}
+
+.name-field .field-label {
+  float: left;
+  width: 70px;
+}
+.name-field .field-body {
+  float: left;
+  margin-top: -17px;
+}
+
+.has-text-right {
+  text-align: right;
 }
 
 ::-webkit-input-placeholder {

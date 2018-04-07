@@ -30,6 +30,7 @@ type alias Model =
     { days : List Day
     , year : Int
     , month : Int
+    , today : String
     }
 
 
@@ -54,6 +55,7 @@ init session =
         { days = calendar year |> refineMonth month
         , year = year
         , month = month
+        , today = ""
         }
             ! [ CoreDate.now |> Task.perform DateReceived ]
 
@@ -73,6 +75,10 @@ update session msg ({ days } as model) =
                     | year = year
                     , month = month
                     , days = calendar year |> refineMonth month
+                    , today =
+                        [ CoreDate.day date, month, CoreDate.year date ]
+                            |> List.map toString
+                            |> String.join "/"
                 }
                     ! []
 
@@ -176,11 +182,12 @@ viewDay index ({ date, week, obs, kind } as day) =
         tbody []
             [ case ( Date.day date, dayOfWeek ) of
                 ( 1, _ ) ->
-                    tr []
-                        [ th [ colspan 5, class "has-text-centered" ]
-                            [ h3 [] [ date |> Date.month |> monthName |> text ] ]
-                        ]
+                    text ""
 
+                -- tr []
+                --     [ th [ colspan 5, class "has-text-centered" ]
+                --         [ h3 [] [ date |> Date.month |> monthName |> text ] ]
+                --     ]
                 ( _, Date.Mon ) ->
                     tr []
                         [ td [ colspan 5, class "has-text-centered" ]
@@ -266,7 +273,20 @@ view : Session -> Model -> Html Msg
 view session model =
     div [ class "content" ]
         [ monthSelector model
-        , h1 [] [ text <| monthName model.month ++ " " ++ toString model.year ]
+        , h1 []
+            [ text "Relevé de jours travaillés, "
+            , text <| monthName model.month ++ " " ++ toString model.year
+            ]
+        , div [ class "field is-horizontal name-field" ]
+            [ div [ class "field-label is-normal" ]
+                [ label [ class "label" ] [ text "Salarié" ] ]
+            , div [ class "field-body" ]
+                [ div [ class "field" ]
+                    [ p [ class "control is-expanded" ]
+                        [ input [ type_ "text", class "input name", placeholder "Jean Dupuis" ] [] ]
+                    ]
+                ]
+            ]
         , statsView model.days
         , table []
             ((thead []
@@ -279,6 +299,7 @@ view session model =
              )
                 :: (model.days |> List.indexedMap viewDay)
             )
+        , p [ class "has-text-right" ] [ text <| "Le " ++ model.today ++ ", signature du salarié" ]
         ]
 
 
