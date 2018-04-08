@@ -26,11 +26,17 @@ type DayKind
     | Workday Int
 
 
+type Signature
+    = Drafted String
+    | Loaded String
+
+
 type alias Model =
     { days : List Day
     , year : Int
     , month : Int
     , today : String
+    , signature : Signature
     }
 
 
@@ -38,9 +44,12 @@ type Msg
     = DateReceived CoreDate.Date
     | HourDec Day
     | HourInc Day
+    | LoadSig
     | PickMonth Int
     | PickYear Int
+    | ResetSig
     | SetKind Day String
+    | UpdateSig String
 
 
 init : Session -> ( Model, Cmd Msg )
@@ -56,6 +65,7 @@ init session =
         , year = year
         , month = month
         , today = ""
+        , signature = Drafted ""
         }
             ! [ CoreDate.now |> Task.perform DateReceived ]
 
@@ -88,14 +98,32 @@ update session msg ({ days } as model) =
         HourInc day ->
             { model | days = days |> addWordayHours 1 day } ! []
 
+        LoadSig ->
+            { model
+                | signature =
+                    case model.signature of
+                        Drafted signature ->
+                            Loaded signature
+
+                        Loaded _ ->
+                            model.signature
+            }
+                ! []
+
         PickMonth month ->
             { model | month = month, days = calendar model.year |> refineMonth month } ! []
 
         PickYear year ->
             { model | year = year, month = 1, days = calendar year |> refineMonth 1 } ! []
 
+        ResetSig ->
+            { model | signature = Drafted "" } ! []
+
         SetKind day kindString ->
             { model | days = days |> setDayKind kindString day } ! []
+
+        UpdateSig sigUrl ->
+            { model | signature = Drafted sigUrl } ! []
 
 
 
@@ -269,6 +297,34 @@ statsView days =
             ]
 
 
+sigForm : String -> Html Msg
+sigForm sigUrl =
+    Html.form
+        [ class "field is-horizontal sig-field"
+        , onSubmit LoadSig
+        ]
+        [ div [ class "field-label is-normal" ]
+            [ label [ class "label" ] [ text "Signature URL" ] ]
+        , div [ class "field-body" ]
+            [ div [ class "field has-addons" ]
+                [ div [ class "control" ]
+                    [ input
+                        [ type_ "text"
+                        , class "input sig"
+                        , placeholder "http://"
+                        , onInput UpdateSig
+                        , required True
+                        ]
+                        []
+                    ]
+                , div [ class "control" ]
+                    [ button [ type_ "submit", class "button" ] [ text "Load" ]
+                    ]
+                ]
+            ]
+        ]
+
+
 view : Session -> Model -> Html Msg
 view session model =
     div [ class "content" ]
@@ -299,7 +355,18 @@ view session model =
              )
                 :: (model.days |> List.indexedMap viewDay)
             )
-        , p [ class "has-text-right" ] [ text <| "Le " ++ model.today ++ ", signature du salarié" ]
+        , p [ class "has-text-right" ]
+            [ text <| "Le " ++ model.today ++ ", signature du salarié" ]
+        , case model.signature of
+            Drafted sigUrl ->
+                sigForm sigUrl
+
+            Loaded sigUrl ->
+                p [ class "has-text-right" ]
+                    [ img [ class "sigImg", src sigUrl ] []
+                    , br [] []
+                    , button [ class "button", onClick ResetSig ] [ text "reset" ]
+                    ]
         ]
 
 

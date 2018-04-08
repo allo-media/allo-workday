@@ -1,3 +1,8 @@
+@page {
+  size: auto;
+  margin: 5mm 5mm 5mm 5mm;
+}
+
 body {
   font-family: Ubuntu;
   margin: 0 1em;
@@ -10,6 +15,11 @@ body {
 
 .month-selector {
   display: none;
+}
+
+h1 {
+  margin: 0 0 .2em 0;
+  padding: 0;
 }
 
 table {
@@ -50,8 +60,16 @@ input, select {
   margin-top: -17px;
 }
 
+.sig-field label {
+  display: none;
+}
+
 .has-text-right {
   text-align: right;
+}
+
+.sigImg {
+  max-width: 200px;
 }
 
 ::-webkit-input-placeholder {
