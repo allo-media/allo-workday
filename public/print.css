@@ -5,6 +5,7 @@
 
 body {
   font-family: Ubuntu;
+  font-size: 14px;
   margin: 0 1em;
   padding: 0;
 }
@@ -66,6 +67,10 @@ input, select {
 
 .has-text-right {
   text-align: right;
+}
+
+.warn {
+  font-size: 10px;
 }
 
 .sigImg {
