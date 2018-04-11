@@ -14,16 +14,23 @@ type alias Day =
     { date : Date
     , week : Int
     , obs : String
-    , kind : DayKind
+    , afternoon : Kind
+    , morning : Kind
     }
 
 
-type DayKind
+type DaySlice
+    = Afternoon
+    | Morning
+
+
+type Kind
     = PaidVacation
     | PublicHoliday String
     | Rtt
     | SickLeave
-    | Workday Int
+    | Worked
+    | Other String
 
 
 type Signature
@@ -42,13 +49,11 @@ type alias Model =
 
 type Msg
     = DateReceived CoreDate.Date
-    | HourDec Day
-    | HourInc Day
     | LoadSig
     | PickMonth Int
     | PickYear Int
     | ResetSig
-    | SetKind Day String
+    | SetKind DaySlice Day String
     | UpdateSig String
 
 
@@ -92,12 +97,6 @@ update session msg ({ days } as model) =
                 }
                     ! []
 
-        HourDec day ->
-            { model | days = days |> addWordayHours -1 day } ! []
-
-        HourInc day ->
-            { model | days = days |> addWordayHours 1 day } ! []
-
         LoadSig ->
             { model
                 | signature =
@@ -119,8 +118,8 @@ update session msg ({ days } as model) =
         ResetSig ->
             { model | signature = Drafted "" } ! []
 
-        SetKind day kindString ->
-            { model | days = days |> setDayKind kindString day } ! []
+        SetKind daySlice day kindString ->
+            { model | days = days |> setKind daySlice kindString day } ! []
 
         UpdateSig sigUrl ->
             { model | signature = Drafted sigUrl } ! []
@@ -160,49 +159,63 @@ monthSelector { year, month } =
         ]
 
 
-kindSelector : Day -> Html Msg
-kindSelector ({ kind } as day) =
-    div [ class "select" ]
-        [ select
-            [ disabled <| kindToString kind == "jf"
-            , onInput (SetKind day)
-            ]
-            [ option
-                [ value "cp"
-                , selected <| kindToString kind == "cp"
-                ]
-                [ text "Congé payé" ]
-            , case kind of
-                PublicHoliday _ ->
-                    option
-                        [ value "jf"
-                        , selected <| kindToString kind == "jf"
-                        ]
-                        [ text "Jour férié" ]
+kindSelector : DaySlice -> Day -> Html Msg
+kindSelector daySlice day =
+    let
+        sliceKind =
+            case daySlice of
+                Afternoon ->
+                    day.afternoon
 
-                _ ->
-                    text ""
-            , option
-                [ value "jt"
-                , selected <| kindToString kind == "jt"
+                Morning ->
+                    day.morning
+    in
+        div [ class "select" ]
+            [ select
+                [ disabled <| kindToString sliceKind == "jf"
+                , onInput (SetKind daySlice day)
                 ]
-                [ text "Jour travaillé" ]
-            , option
-                [ value "ml"
-                , selected <| kindToString kind == "ml"
+                [ option
+                    [ value "cp"
+                    , selected <| kindToString sliceKind == "cp"
+                    ]
+                    [ text "Congé payé" ]
+                , case sliceKind of
+                    PublicHoliday _ ->
+                        option
+                            [ value "jf"
+                            , selected <| kindToString sliceKind == "jf"
+                            ]
+                            [ text "Jour férié" ]
+
+                    _ ->
+                        text ""
+                , option
+                    [ value "jt"
+                    , selected <| kindToString sliceKind == "jt"
+                    ]
+                    [ text "Jour travaillé" ]
+                , option
+                    [ value "ml"
+                    , selected <| kindToString sliceKind == "ml"
+                    ]
+                    [ text "Maladie" ]
+                , option
+                    [ value "rtt"
+                    , selected <| kindToString sliceKind == "rtt"
+                    ]
+                    [ text "RTT" ]
+                , option
+                    [ value "ot"
+                    , selected <| kindToString sliceKind == "ot"
+                    ]
+                    [ text "Autre" ]
                 ]
-                [ text "Maladie" ]
-            , option
-                [ value "rtt"
-                , selected <| kindToString kind == "rtt"
-                ]
-                [ text "RTT" ]
             ]
-        ]
 
 
 viewDay : Int -> Day -> Html Msg
-viewDay index ({ date, week, obs, kind } as day) =
+viewDay index ({ date, week, obs } as day) =
     let
         dayOfWeek =
             Date.weekday date
@@ -212,10 +225,6 @@ viewDay index ({ date, week, obs, kind } as day) =
                 ( 1, _ ) ->
                     text ""
 
-                -- tr []
-                --     [ th [ colspan 5, class "has-text-centered" ]
-                --         [ h3 [] [ date |> Date.month |> monthName |> text ] ]
-                --     ]
                 ( _, Date.Mon ) ->
                     tr []
                         [ td [ colspan 5, class "has-text-centered" ]
@@ -227,32 +236,8 @@ viewDay index ({ date, week, obs, kind } as day) =
             , tr []
                 [ td [ class "text-cell" ] [ dayOfWeek |> dayName |> text ]
                 , td [ class "text-cell" ] [ date |> Date.day |> toString |> text ]
-                , td [] [ kindSelector day ]
-                , case kind of
-                    Workday hours ->
-                        td []
-                            [ div [ class "field has-addons" ]
-                                [ div [ class "control" ]
-                                    [ input
-                                        [ class "input has-text-centered"
-                                        , style [ ( "width", "50px" ) ]
-                                        , type_ "number"
-                                        , value <| toString hours
-                                        , readonly True
-                                        ]
-                                        []
-                                    ]
-                                , div [ class "control" ]
-                                    [ button [ class "button", onClick (HourDec day) ] [ text "-" ]
-                                    ]
-                                , div [ class "control" ]
-                                    [ button [ class "button", onClick (HourInc day) ] [ text "+" ]
-                                    ]
-                                ]
-                            ]
-
-                    _ ->
-                        td [ class "text-cell" ] [ div [ class "zero-value" ] [ text "0" ] ]
+                , td [] [ kindSelector Morning day ]
+                , td [] [ kindSelector Afternoon day ]
                 , td []
                     [ input
                         [ class "input"
@@ -269,6 +254,9 @@ viewDay index ({ date, week, obs, kind } as day) =
 statsView : List Day -> Html Msg
 statsView days =
     let
+        totalOther =
+            computeOther days
+
         totalPaidVacation =
             computeTotalPaidVacation days
 
@@ -287,12 +275,14 @@ statsView days =
                 , th [] [ text "RTT" ]
                 , th [] [ text "Congés payés" ]
                 , th [] [ text "Maladie" ]
+                , th [] [ text "Autre" ]
                 ]
             , tbody []
                 [ td [] [ text <| toString totalWorked ++ "j" ]
                 , td [] [ text <| toString totalRtt ++ "j" ]
                 , td [] [ text <| toString totalPaidVacation ++ "j" ]
                 , td [] [ text <| toString totalSickLeave ++ "j" ]
+                , td [] [ text <| toString totalOther ++ "j" ]
                 ]
             ]
 
@@ -348,13 +338,19 @@ view session model =
             ((thead []
                 [ th [] [ text "Jour" ]
                 , th [] [ text "Date" ]
-                , th [] [ text "Type" ]
-                , th [] [ text "Heures" ]
+                , th [] [ text "Matin" ]
+                , th [] [ text "Après-midi" ]
                 , th [] [ text "Observation" ]
                 ]
              )
                 :: (model.days |> List.indexedMap viewDay)
             )
+        , p [ class "warn" ]
+            [ text """Nous vous rappelons la nécessité de respecter une amplitude
+                         et une charge de travail raisonnable ainsi qu'une bonne répartition
+                         dans le temps du travail. Nous vous remercions de nous faire part
+                         de vos éventuelles observations relatives notamment à votre charge
+                         de travail.""" ]
         , p [ class "has-text-right" ]
             [ text <| "Le " ++ model.today ++ ", signature du salarié" ]
         , case model.signature of
@@ -372,35 +368,6 @@ view session model =
 
 
 -- Utils
-
-
-addWordayHours : Int -> Day -> List Day -> List Day
-addWordayHours toAdd day days =
-    case day.kind of
-        Workday hours ->
-            let
-                testHours =
-                    hours + toAdd
-
-                newHours =
-                    if testHours < 0 then
-                        0
-                    else if testHours > 8 then
-                        8
-                    else
-                        testHours
-            in
-                days
-                    |> List.map
-                        (\d ->
-                            if d == day then
-                                { d | kind = Workday newHours }
-                            else
-                                d
-                        )
-
-        _ ->
-            days
 
 
 calendar : Int -> List Day
@@ -423,38 +390,39 @@ calendar year =
                 date =
                     firstDay |> Date.addDays d
 
-                ( obs, kind ) =
+                ( obs, morning, afternoon ) =
                     case Dict.get (Date.toISO8601 date) yearOffdays of
                         Just offdayName ->
-                            ( offdayName, PublicHoliday offdayName )
+                            ( offdayName, PublicHoliday offdayName, PublicHoliday offdayName )
 
                         Nothing ->
-                            ( "", Workday 8 )
+                            ( "", Worked, Worked )
             in
                 { date = date
                 , week = (d // 7) + weekOffset
                 , obs = obs
-                , kind = kind
+                , morning = morning
+                , afternoon = afternoon
                 }
     in
         List.range 0 364
             |> List.map createDay
-            |> List.filter
-                (\{ date } ->
-                    Date.weekday date
-                        /= Date.Sat
-                        && Date.weekday date
-                        /= Date.Sun
-                )
+            |> List.filter (\{ date } -> Date.weekday date /= Date.Sun)
 
 
-computeTotalPaidVacation : List Day -> Int
+computeTotalPaidVacation : List Day -> Float
 computeTotalPaidVacation days =
     (days
         |> List.map
-            (\{ kind } ->
-                case kind of
-                    PaidVacation ->
+            (\{ morning, afternoon } ->
+                case ( morning, afternoon ) of
+                    ( PaidVacation, PaidVacation ) ->
+                        2
+
+                    ( _, PaidVacation ) ->
+                        1
+
+                    ( PaidVacation, _ ) ->
                         1
 
                     _ ->
@@ -462,15 +430,45 @@ computeTotalPaidVacation days =
             )
         |> List.sum
     )
+        / 2
 
 
-computeTotalRtt : List Day -> Int
+computeOther : List Day -> Float
+computeOther days =
+    (days
+        |> List.map
+            (\{ morning, afternoon } ->
+                case ( morning, afternoon ) of
+                    ( Other _, Other _ ) ->
+                        2
+
+                    ( _, Other _ ) ->
+                        1
+
+                    ( Other _, _ ) ->
+                        1
+
+                    _ ->
+                        0
+            )
+        |> List.sum
+    )
+        / 2
+
+
+computeTotalRtt : List Day -> Float
 computeTotalRtt days =
     (days
         |> List.map
-            (\{ kind } ->
-                case kind of
-                    Rtt ->
+            (\{ morning, afternoon } ->
+                case ( morning, afternoon ) of
+                    ( Rtt, Rtt ) ->
+                        2
+
+                    ( _, Rtt ) ->
+                        1
+
+                    ( Rtt, _ ) ->
                         1
 
                     _ ->
@@ -478,15 +476,22 @@ computeTotalRtt days =
             )
         |> List.sum
     )
+        / 2
 
 
-computeTotalSickLeave : List Day -> Int
+computeTotalSickLeave : List Day -> Float
 computeTotalSickLeave days =
     (days
         |> List.map
-            (\{ kind } ->
-                case kind of
-                    SickLeave ->
+            (\{ morning, afternoon } ->
+                case ( morning, afternoon ) of
+                    ( SickLeave, SickLeave ) ->
+                        2
+
+                    ( _, SickLeave ) ->
+                        1
+
+                    ( SickLeave, _ ) ->
                         1
 
                     _ ->
@@ -494,16 +499,23 @@ computeTotalSickLeave days =
             )
         |> List.sum
     )
+        / 2
 
 
 computeTotalWorkedDays : List Day -> Float
 computeTotalWorkedDays days =
     (days
         |> List.map
-            (\{ kind } ->
-                case kind of
-                    Workday hours ->
-                        hours
+            (\{ morning, afternoon } ->
+                case ( morning, afternoon ) of
+                    ( Worked, Worked ) ->
+                        2
+
+                    ( _, Worked ) ->
+                        1
+
+                    ( Worked, _ ) ->
+                        1
 
                     _ ->
                         0
@@ -511,7 +523,7 @@ computeTotalWorkedDays days =
         |> List.sum
         |> toFloat
     )
-        / 8
+        / 2
 
 
 coreMonthToInt : CoreDate.Month -> Int
@@ -579,9 +591,12 @@ dayName day =
             "Dim"
 
 
-kindToString : DayKind -> String
+kindToString : Kind -> String
 kindToString kind =
     case kind of
+        Other _ ->
+            "ot"
+
         PaidVacation ->
             "cp"
 
@@ -594,7 +609,7 @@ kindToString kind =
         SickLeave ->
             "ml"
 
-        Workday _ ->
+        Worked ->
             "jt"
 
 
@@ -683,36 +698,45 @@ refineMonth month days =
         |> List.filter (\({ date } as wd) -> Date.month date == month)
 
 
-setDayKind : String -> Day -> List Day -> List Day
-setDayKind kindString day days =
-    days
-        |> List.map
-            (\d ->
-                if d == day then
-                    { d
-                        | kind =
-                            case kindString of
-                                "cp" ->
-                                    PaidVacation
+setKind : DaySlice -> String -> Day -> List Day -> List Day
+setKind daySlice kindString day days =
+    let
+        kind =
+            case kindString of
+                "ot" ->
+                    Other ""
 
-                                "jf" ->
-                                    PublicHoliday ""
+                "cp" ->
+                    PaidVacation
 
-                                "rtt" ->
-                                    Rtt
+                "jf" ->
+                    PublicHoliday ""
 
-                                "ml" ->
-                                    SickLeave
+                "rtt" ->
+                    Rtt
 
-                                "jt" ->
-                                    Workday 8
+                "ml" ->
+                    SickLeave
 
-                                _ ->
-                                    Debug.crash <| "unsupported kind " ++ kindString
-                    }
-                else
-                    d
-            )
+                "jt" ->
+                    Worked
+
+                _ ->
+                    Debug.crash <| "unsupported kind " ++ kindString
+    in
+        days
+            |> List.map
+                (\d ->
+                    if d == day then
+                        case daySlice of
+                            Afternoon ->
+                                { d | afternoon = kind }
+
+                            Morning ->
+                                { d | morning = kind }
+                    else
+                        d
+                )
 
 
 timestr : Int -> Int -> Int -> String
