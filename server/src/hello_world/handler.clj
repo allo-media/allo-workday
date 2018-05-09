@@ -13,17 +13,20 @@
 (defn get_projects
   []
   (let [results (jdbc/query db ["SELECT * FROM Projects"])]
-    (prn results)
-
     (cond (empty? results)
-        ("Empty Db")
-        :else
-        (lazy-seq results))))
+          ("Empty Db")
+          :else
+          (lazy-seq results))))
 
 (defroutes app-routes
-  (GET "/" [] "Hello World")
-  (GET "/projects" [] (json/write-str (get_projects)))
-  (route/not-found "Not Found"))
+           (GET "/" [] "Hello World")
+
+           (GET "/projects" []
+                {:status 200
+                 :headers {"Content-Type" "application/json; charset=utf-8"}
+                 :body (json/write-str (get_projects))})
+
+           (route/not-found "Not Found"))
 
 (def app
   (wrap-defaults app-routes site-defaults))
