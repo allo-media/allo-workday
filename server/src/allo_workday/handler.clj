@@ -1,9 +1,9 @@
 (ns allo-workday.handler
   (:require [compojure.core :refer :all]
+            [compojure.handler :as handler]
             [compojure.route :as route]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-            [clojure.java.jdbc :as jdbc]
-            [clojure.data.json :as json]))
+            [ring.middleware.json :as middleware]
+            [clojure.java.jdbc :as jdbc]))
 
 (def db
   {:classname   "org.sqlite.JDBC"
@@ -18,15 +18,38 @@
           :else
           (lazy-seq results))))
 
+(defn post_days
+  [req]
+
+  (let [date (or (get-in req [:params :date])
+                 (get-in req [:body :date])
+                 "DATE_failed")
+        morning (or (get-in req [:params :morning])
+                    (get-in req [:body :morning])
+                    "MORNING_failed")
+        afternoon (or (get-in req [:params :afternoon])
+                      (get-in req [:body :afternoon])
+                      "AFTERNOON_failed")
+        comments (or (get-in req [:params :comment])
+                     (get-in req [:body :comment])
+                     "COMMENTS_failed")]
+
+    (jdbc/insert! db :Days
+                  {:Date date :Morning morning :Afternoon afternoon :Comments comments})))
+
 (defroutes app-routes
-           (GET "/" [] "Hello World")
+  (GET "/" [] "Hello World")
 
-           (GET "/projects" []
-                {:status 200
-                 :headers {"Content-Type" "application/json; charset=utf-8"}
-                 :body (json/write-str (get_projects))})
+  (GET "/projects" []
+    {:status 200
+     :headers {"Content-Type" "application/json; charset=utf-8"}
+     :body (get_projects)})
 
-           (route/not-found "Not Found"))
+  (POST "/personal/days" response (post_days response))
+
+  (route/not-found "Not Found"))
 
 (def app
-  (wrap-defaults app-routes site-defaults))
+  (-> (handler/site app-routes)
+      (middleware/wrap-json-body {:keywords? true})
+      middleware/wrap-json-response))

@@ -2,7 +2,7 @@
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [compojure "1.5.1"]
-                 [ring/ring-defaults "0.2.1"]
+                 [ring/ring-json "0.3.1"]
                  [org.clojure/java.jdbc "0.7.5"]
                  [org.xerial/sqlite-jdbc "3.7.2"]
                  [org.clojure/data.json "0.2.6" ]]

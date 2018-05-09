@@ -1,16 +1,16 @@
 CREATE TABLE Projects (
-    ID int NOT NULL PRIMARY KEY,
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
     Name string NOT NULL
 );
 
 CREATE TABLE Users (
-    ID int NOT NULL PRIMARY KEY,
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
     Email string NOT NULL,
     Password string NOT NULL
 );
 
-CREATE TABLE day (
-    ID int NOT NULL PRIMARY KEY,
+CREATE TABLE Days (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
     Date string NOT NULL,
     Morning string NOT NULL,
     Afternoon string NOT NULL,
@@ -19,7 +19,6 @@ CREATE TABLE day (
 
 
 
-INSERT INTO Projects VALUES (
-    1,
+INSERT INTO Projects (Name) VALUES (
     "Cookie Vocal"
 ); 
