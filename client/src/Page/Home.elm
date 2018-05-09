@@ -396,7 +396,12 @@ calendar year =
                             ( offdayName, PublicHoliday offdayName, PublicHoliday offdayName )
 
                         Nothing ->
-                            ( "", Worked, Worked )
+                            case Date.weekday date of
+                                Date.Sat ->
+                                    ( "Repos", Other "", Other "" )
+
+                                _ ->
+                                    ( "", Worked, Worked )
             in
                 { date = date
                 , week = (d // 7) + weekOffset
