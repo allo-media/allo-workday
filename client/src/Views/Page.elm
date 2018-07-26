@@ -1,9 +1,11 @@
 module Views.Page exposing (ActivePage(..), Config, frame)
 
+-- import Html.Styled.Attributes exposing (class, css, href, src)
+
 import Css exposing (..)
 import Data.Session exposing (Session)
 import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (class, css, href, src)
+import Views.App as App
 import Views.Theme exposing (Element, defaultCss)
 
 
@@ -21,24 +23,10 @@ type alias Config =
 frame : Config -> Html msg -> Html msg
 frame config content =
     div []
-        [ defaultCss
-        , viewHeader config
-        , div [ css [ padding2 (Css.em 1) zero ] ] [ content ]
+        [ viewHeader config
+        , div [] [ content ]
         ]
-
-
-githubIconStyle : Element msg
-githubIconStyle =
-    styled a
-        [ position absolute
-        , top (px 15)
-        , right (px 15)
-        , border3 (px 1) solid (rgba 255 255 255 0.3)
-        , padding (px 10)
-        , borderRadius (px 4)
-        , color (hex "999")
-        , textDecoration none
-        ]
+        |> App.view
 
 
 title : Element msg
@@ -54,21 +42,5 @@ title =
 
 viewHeader : Config -> Html msg
 viewHeader _ =
-    div [ class "header" ]
-        [ title [] [ text "elm-kitchen" ]
-        , githubIconStyle
-            [ Html.Styled.Attributes.target "_blank"
-            , href "https://github.com/allo-media/elm-kitchen"
-            ]
-            [ img
-                [ src "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Ei-sc-github.svg/768px-Ei-sc-github.svg.png"
-                , css
-                    [ width (px 96)
-                    , height (px 96)
-                    , float left
-                    ]
-                ]
-                []
-            , span [ css [ color (hex "000"), display block, textAlign center ] ] [ text "Github" ]
-            ]
-        ]
+    div []
+        []

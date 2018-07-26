@@ -3,17 +3,19 @@ module Route exposing (Route(..), fromLocation, href, modifyUrl)
 import Html.Styled exposing (Attribute)
 import Html.Styled.Attributes as Attr
 import Navigation exposing (Location)
-import UrlParser as Url exposing (Parser)
+import UrlParser as Url exposing (Parser, s)
 
 
 type Route
     = Home
+    | Login
 
 
 route : Parser (Route -> a) a
 route =
     Url.oneOf
         [ Url.map Home Url.top
+        , Url.map Login (s "login")
         ]
 
 
@@ -37,6 +39,9 @@ routeToString route =
             case route of
                 Home ->
                     []
+
+                Login ->
+                    [ "login" ]
     in
     "#/" ++ String.join "/" pieces
 

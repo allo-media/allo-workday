@@ -8,7 +8,7 @@ import Html.Styled exposing (Attribute, Html)
 type alias Theme =
     { primaryColor : Color
     , primaryBgColor : Color
-    , secondaryBgColor : Color
+    , primaryBgImageGradient : Style
     , fonts : List String
     }
 
@@ -19,10 +19,16 @@ type alias Element msg =
 
 theme : Theme
 theme =
-    { primaryColor = hex "333"
-    , primaryBgColor = hex "b01246"
-    , secondaryBgColor = hex "fafafa"
-    , fonts = [ "Lato", .value sansSerif ]
+    { primaryColor = rgba 132 132 132 1
+    , primaryBgColor = rgba 236 241 247 1
+    , primaryBgImageGradient =
+        backgroundImage
+            (linearGradient2 (deg 131)
+                (stop2 (hex "746BDE") (pct 23))
+                (stop2 (hex "381CE2") (pct 100))
+                []
+            )
+    , fonts = [ "Montserrat", .value sansSerif ]
     }
 
 
@@ -30,16 +36,16 @@ defaultCss : Html msg
 defaultCss =
     global
         [ html
-            [ backgroundColor theme.secondaryBgColor
-            , width (pct 100)
+            [ width (pct 100)
             , height (pct 100)
             ]
         , body
-            [ color theme.primaryColor
-            , margin2 (pct 0) auto
-            , width (px 640)
+            [ margin2 auto auto
+            , width (pct 100)
+            , height (pct 100)
             , fontFamilies theme.fonts
+            , color theme.primaryColor
+            , fontSize (px 16)
+            , backgroundColor theme.primaryBgColor
             ]
-        , img
-            [ width (px 640) ]
         ]

@@ -4,7 +4,9 @@ import Data.Session exposing (Session)
 import Html.Styled as Html exposing (..)
 import Navigation exposing (Location)
 import Page.Home as Home
+import Page.Login as Login
 import Route exposing (Route)
+import Views.App as App
 import Views.Page as Page
 
 
@@ -15,6 +17,7 @@ type alias Flags =
 type Page
     = Blank
     | HomePage Home.Model
+    | LoginPage Login.Model
     | NotFound
 
 
@@ -26,6 +29,7 @@ type alias Model =
 
 type Msg
     = HomeMsg Home.Msg
+    | LoginMsg Login.Msg
     | SetRoute (Maybe Route)
 
 
@@ -42,6 +46,14 @@ setRoute maybeRoute model =
             in
             { model | page = HomePage homeModel }
                 ! [ Cmd.map HomeMsg homeCmds ]
+
+        Just Route.Login ->
+            let
+                ( loginModel, loginCmds ) =
+                    Login.init model.session
+            in
+            { model | page = LoginPage loginModel }
+                ! [ Cmd.map LoginMsg loginCmds ]
 
 
 init : Flags -> Location -> ( Model, Cmd Msg )
@@ -76,6 +88,9 @@ update msg ({ page, session } as model) =
         ( HomeMsg homeMsg, HomePage homeModel ) ->
             toPage HomePage HomeMsg (Home.update session) homeMsg homeModel
 
+        ( LoginMsg loginMsg, LoginPage loginModel ) ->
+            toPage LoginPage LoginMsg (Login.update session) loginMsg loginModel
+
         ( _, NotFound ) ->
             { model | page = NotFound } ! []
 
@@ -87,6 +102,9 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     case model.page of
         HomePage _ ->
+            Sub.none
+
+        LoginPage _ ->
             Sub.none
 
         NotFound ->
@@ -107,6 +125,11 @@ view model =
             Home.view model.session homeModel
                 |> Html.map HomeMsg
                 |> Page.frame (pageConfig Page.Home)
+
+        LoginPage loginModel ->
+            Login.view model.session loginModel
+                |> Html.map LoginMsg
+                |> App.view
 
         NotFound ->
             Html.div [] [ Html.text "Not found" ]
