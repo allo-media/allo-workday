@@ -1,4 +1,4 @@
-module Views.Theme exposing (Element, defaultCss, theme)
+module Views.Theme exposing (Element, defaultCss, identify, theme)
 
 import Css exposing (..)
 import Css.Foreign exposing (body, global, html, img)
@@ -15,21 +15,6 @@ type alias Theme =
 
 type alias Element msg =
     List (Attribute msg) -> List (Html msg) -> Html msg
-
-
-theme : Theme
-theme =
-    { primaryColor = rgba 132 132 132 1
-    , primaryBgColor = rgba 236 241 247 1
-    , primaryBgImageGradient =
-        backgroundImage
-            (linearGradient2 (deg 131)
-                (stop2 (hex "746BDE") (pct 23))
-                (stop2 (hex "381CE2") (pct 100))
-                []
-            )
-    , fonts = [ "Montserrat", .value sansSerif ]
-    }
 
 
 defaultCss : Html msg
@@ -49,3 +34,23 @@ defaultCss =
             , backgroundColor theme.primaryBgColor
             ]
         ]
+
+
+identify : String -> Style
+identify styleName =
+    property "-style-name" styleName
+
+
+theme : Theme
+theme =
+    { primaryColor = rgba 132 132 132 1
+    , primaryBgColor = rgba 236 241 247 1
+    , primaryBgImageGradient =
+        backgroundImage
+            (linearGradient2 (deg 131)
+                (stop2 (hex "746BDE") (pct 23))
+                (stop2 (hex "381CE2") (pct 100))
+                []
+            )
+    , fonts = [ "Montserrat", .value sansSerif ]
+    }
