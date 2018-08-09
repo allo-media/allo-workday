@@ -5,10 +5,15 @@ import Html.Styled exposing (..)
 import Views.Theme exposing (Element, identify)
 
 
+baseIdentifyKey : String -> String
+baseIdentifyKey string =
+    "Views.UI.Input." ++ string
+
+
 default : Element msg
 default =
     styled input
-        [ identify "Views.Ui.Input"
+        [ identify <| baseIdentifyKey "default"
         , borderRadius (px 2.2)
         , backgroundColor (hex "e5e9ed")
         , border3 (px 0.6) solid (rgba 208 208 208 0.5)
@@ -23,7 +28,7 @@ default =
 medium : Element msg
 medium =
     styled default
-        [ identify "Views.Ui.Input.medium"
+        [ identify <| baseIdentifyKey "medium"
         , width (pct 50)
         , textAlign center
         ]
@@ -32,6 +37,6 @@ medium =
 fullWidth : Element msg
 fullWidth =
     styled default
-        [ identify "Views.Ui.Input.fullWidth"
+        [ identify <| baseIdentifyKey "fullWidth"
         , width (pct 100)
         ]

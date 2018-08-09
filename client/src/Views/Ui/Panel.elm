@@ -5,10 +5,15 @@ import Html.Styled exposing (..)
 import Views.Theme exposing (Element, identify)
 
 
+baseIdentifyKey : String -> String
+baseIdentifyKey string =
+    "Views.Ui.Panel." ++ string
+
+
 default : Element msg
 default =
     styled div
-        [ identify "panel"
+        [ identify <| baseIdentifyKey "default"
         , backgroundColor (hex "FFF")
         , borderRadius (px 5.5)
         , boxShadow5 zero zero (px 3) (px 2) (rgba 0 0 0 0.15)
@@ -19,7 +24,7 @@ default =
 medium : Element msg
 medium =
     styled default
-        [ identify "panel-medium"
+        [ identify <| baseIdentifyKey "medium"
         , width (px 462)
         , minHeight (px 414)
         ]
