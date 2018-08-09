@@ -5,15 +5,22 @@ import Html.Styled exposing (..)
 import Views.Theme exposing (Element, identify)
 
 
+baseIdentifyKey : String -> String
+baseIdentifyKey string =
+    "Views.UI.Logo." ++ string
+
+
 default : Element msg
 default =
-    styled div
-        [ backgroundImage (url "/assets/sprite.svg#logo")
-        , width (px 158)
-        , height (px 158)
+    styled img
+        [ identify <| baseIdentifyKey "default"
         ]
 
 
 medium : Element msg
 medium =
-    styled default []
+    styled default
+        [ identify <| baseIdentifyKey "medium"
+        , width (px 158)
+        , height (px 158)
+        ]
