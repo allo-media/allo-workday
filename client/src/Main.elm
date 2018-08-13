@@ -1,12 +1,12 @@
 module Main exposing (main)
 
+import Data.Page exposing (ActivePage(..), Config)
 import Data.Session exposing (Session)
 import Html.Styled as Html exposing (..)
 import Navigation exposing (Location)
 import Page.Home as Home
 import Page.Login as Login
 import Route exposing (Route)
-import Views.App as App
 import Views.Page as Page
 
 
@@ -118,26 +118,26 @@ view : Model -> Html Msg
 view model =
     let
         pageConfig =
-            Page.Config model.session
+            Config model.session
     in
     case model.page of
         HomePage homeModel ->
             Home.view model.session homeModel
                 |> Html.map HomeMsg
-                |> Page.frame (pageConfig Page.Home)
+                |> Page.view (pageConfig Home)
 
         LoginPage loginModel ->
             Login.view model.session loginModel
                 |> Html.map LoginMsg
-                |> App.view
+                |> Page.view (pageConfig Other)
 
         NotFound ->
             Html.div [] [ Html.text "Not found" ]
-                |> Page.frame (pageConfig Page.Other)
+                |> Page.view (pageConfig Other)
 
         Blank ->
             Html.text ""
-                |> Page.frame (pageConfig Page.Other)
+                |> Page.view (pageConfig Other)
 
 
 main : Program Flags Model Msg
