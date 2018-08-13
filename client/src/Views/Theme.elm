@@ -21,11 +21,13 @@ defaultCss : Html msg
 defaultCss =
     global
         [ html
-            [ width (pct 100)
+            [ identify "Views.Theme.defaultCss"
+            , width (pct 100)
             , height (pct 100)
             ]
         , body
-            [ margin2 auto auto
+            [ identify "Views.Theme.defaultCss"
+            , margin2 auto auto
             , width (pct 100)
             , height (pct 100)
             , fontFamilies theme.fonts
