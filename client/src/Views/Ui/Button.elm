@@ -5,15 +5,15 @@ import Html.Styled exposing (button, styled)
 import Views.Theme exposing (Element, identify)
 
 
-baseIdentifyKey : String -> String
-baseIdentifyKey string =
-    "Views.UI.Button." ++ string
+identify_ : String -> Style
+identify_ string =
+    "Views.UI.Button." ++ string |> identify
 
 
 default : Element msg
 default =
     styled button
-        [ identify <| baseIdentifyKey "default"
+        [ identify_ "default"
         , fontSize (Css.rem 1)
         , textAlign center
         , color (hex "FFF")
@@ -26,7 +26,7 @@ default =
 primary : Element msg
 primary =
     styled default
-        [ identify <| baseIdentifyKey "primary"
+        [ identify_ "primary"
         , backgroundColor (rgba 116 107 222 1)
         ]
 
@@ -34,7 +34,7 @@ primary =
 primaryLarge : Element msg
 primaryLarge =
     styled primary
-        [ identify <| baseIdentifyKey "primaryLarge"
+        [ identify_ "primaryLarge"
         , width (pct 75)
         ]
 
@@ -42,4 +42,4 @@ primaryLarge =
 secondary : Element msg
 secondary =
     styled default
-        [ identify <| baseIdentifyKey "secondary" ]
+        [ identify_ "secondary" ]
