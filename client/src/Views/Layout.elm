@@ -19,7 +19,7 @@ home config content =
         [ css
             [ identify_ "home"
             , property "display" "grid"
-            , property "grid-template-rows" "8.3333333vh"
+            , property "grid-template-rows" "88px"
             ]
         ]
         [ Header.view config, content ]
