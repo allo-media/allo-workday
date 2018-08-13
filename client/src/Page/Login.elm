@@ -2,7 +2,7 @@ module Page.Login exposing (Model, Msg, init, update, view)
 
 import Css exposing (..)
 import Data.Session exposing (Session)
-import Html.Styled exposing (Html, div, text)
+import Html.Styled exposing (Html, div, h1, text)
 import Html.Styled.Attributes exposing (css, placeholder, src, type_)
 import Views.Theme exposing (theme)
 import Views.Ui.Button as Button
@@ -42,11 +42,21 @@ view session model =
             , property "align-content" "center"
             ]
         ]
-        [ Logo.medium [ css [ property "justify-self" "center" ], src "assets/logoWorkday.svg" ] []
+        [ Logo.medium
         , Typography.headingLogin [] [ text "Workday" ]
-        , Panel.medium []
-            [ Input.fullWidth [ type_ "email", placeholder "email" ] []
+        , Panel.medium [ css [ padding2 (px 10) (px 40) ] ]
+            [ h1
+                [ css
+                    [ textTransform uppercase
+                    , color theme.primaryColor
+                    , fontSize (Css.rem 1.25)
+                    , textAlign center
+                    , margin2 (px 40) zero
+                    ]
+                ]
+                [ text "Sign in to your account" ]
+            , Input.fullWidth [ type_ "email", placeholder "email" ] []
             , Input.fullWidth [ type_ "password", placeholder "password" ] []
-            , Button.primaryLarge [] [ text "Sign in" ]
+            , Button.primaryFullWidth [] [ text "Sign in" ]
             ]
         ]
