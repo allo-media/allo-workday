@@ -24,7 +24,7 @@ view : Config -> Html msg -> Html msg
 view config content =
     case config.activePage of
         Home ->
-            Layout.app config content
+            Layout.home config content
                 |> pageBox
 
         Login ->
