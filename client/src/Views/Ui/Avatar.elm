@@ -18,4 +18,5 @@ medium =
         , border3 (px 4) solid (rgb 255 255 255)
         , width (px 56)
         , height (px 56)
+        , boxShadow5 zero (px 2) (px 4) zero (rgba 0 0 0 0.17)
         ]

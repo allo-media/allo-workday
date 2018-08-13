@@ -76,7 +76,30 @@ view _ =
                 ]
             ]
             [ Typography.primaryHeaderText [ css [ marginRight (px 17) ] ] [ text "Mickael Scott" ]
-            , Avatar.medium [ src "https://randomuser.me/api/portraits/men/46.jpg" ] []
+            , div [ css [ position relative ] ]
+                [ Avatar.medium [ src "https://randomuser.me/api/portraits/men/46.jpg" ]
+                    []
+                , div
+                    [ css
+                        [ position absolute
+                        , backgroundColor (rgb 255 255 255)
+                        , borderRadius (pct 50)
+                        , width (px 20)
+                        , height (px 20)
+                        , bottom (px 10)
+                        , boxShadow5 zero (px 2) (px 4) zero (rgba 0 0 0 0.17)
+                        , cursor pointer
+                        , after
+                            [ property "content" "\"\\f013\""
+                            , fontFamilies [ "\"Font Awesome 5 Free\"" ]
+                            , fontWeight (int 900)
+                            , fontSize (px 11)
+                            , paddingLeft (px 4)
+                            ]
+                        ]
+                    ]
+                    []
+                ]
             , logout [ Route.href Route.Login ] [ text "Logout" ]
             ]
         ]
