@@ -26,5 +26,4 @@ update _ msg model =
 
 view : Session -> Model -> Html msg
 view _ model =
-    div []
-        []
+    div [] []
