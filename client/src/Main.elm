@@ -124,20 +124,20 @@ view model =
         HomePage homeModel ->
             Home.view model.session homeModel
                 |> Html.map HomeMsg
-                |> Page.view (pageConfig Home)
+                |> Page.frame (pageConfig Home)
 
         LoginPage loginModel ->
             Login.view model.session loginModel
                 |> Html.map LoginMsg
-                |> Page.view (pageConfig Other)
+                |> Page.frame (pageConfig Other)
 
         NotFound ->
             Html.div [] [ Html.text "Not found" ]
-                |> Page.view (pageConfig Other)
+                |> Page.frame (pageConfig Other)
 
         Blank ->
             Html.text ""
-                |> Page.view (pageConfig Other)
+                |> Page.frame (pageConfig Other)
 
 
 main : Program Flags Model Msg

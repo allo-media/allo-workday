@@ -1,4 +1,4 @@
-module Views.Page exposing (view)
+module Views.Page exposing (frame)
 
 import Css exposing (..)
 import Data.Page exposing (ActivePage(..), Config)
@@ -15,20 +15,20 @@ identify_ string =
         |> identify
 
 
-pageBox : Html msg -> Html msg
-pageBox content =
-    div [ css [ identify_ "pageBox" ] ] [ defaultCss, content ]
+wrap : Html msg -> Html msg
+wrap content =
+    div [ css [ identify_ "wrap" ] ] [ defaultCss, content ]
 
 
-view : Config -> Html msg -> Html msg
-view config content =
+frame : Config -> Html msg -> Html msg
+frame config content =
     case config.activePage of
         Home ->
             Layout.home config content
-                |> pageBox
+                |> wrap
 
         Login ->
-            pageBox content
+            wrap content
 
         Other ->
-            pageBox content
+            wrap content
