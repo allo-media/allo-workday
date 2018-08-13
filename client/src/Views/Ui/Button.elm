@@ -1,4 +1,4 @@
-module Views.Ui.Button exposing (primary, primaryLarge, secondary)
+module Views.Ui.Button exposing (primary, primaryFullWidth, secondary)
 
 import Css exposing (..)
 import Html.Styled exposing (button, styled)
@@ -31,11 +31,11 @@ primary =
         ]
 
 
-primaryLarge : Element msg
-primaryLarge =
+primaryFullWidth : Element msg
+primaryFullWidth =
     styled primary
-        [ identify_ "primaryLarge"
-        , width (pct 75)
+        [ identify_ "primaryFullWidth"
+        , width (pct 100)
         ]
 
 
