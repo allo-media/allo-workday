@@ -1,46 +1,34 @@
-module Views.Page exposing (ActivePage(..), Config, frame)
-
--- import Html.Styled.Attributes exposing (class, css, href, src)
+module Views.Page exposing (view)
 
 import Css exposing (..)
-import Data.Session exposing (Session)
+import Data.Page exposing (ActivePage(..), Config)
 import Html.Styled exposing (..)
-import Views.App as App
-import Views.Theme exposing (Element, defaultCss)
+import Html.Styled.Attributes exposing (css)
+import Views.Layout as Layout
+import Views.Theme exposing (Element, defaultCss, identify)
 
 
-type ActivePage
-    = Home
-    | Other
+identify_ : String -> Style
+identify_ string =
+    "Views.Ui.Page."
+        ++ string
+        |> identify
 
 
-type alias Config =
-    { session : Session
-    , activePage : ActivePage
-    }
+pageBox : Html msg -> Html msg
+pageBox content =
+    div [ css [ identify_ "pageBox" ] ] [ defaultCss, content ]
 
 
-frame : Config -> Html msg -> Html msg
-frame config content =
-    div []
-        [ viewHeader config
-        , div [] [ content ]
-        ]
-        |> App.view
+view : Config -> Html msg -> Html msg
+view config content =
+    case config.activePage of
+        Home ->
+            Layout.app config content
+                |> pageBox
 
+        Login ->
+            pageBox content
 
-title : Element msg
-title =
-    styled h1
-        [ textAlign center
-        , margin2 (Css.em 1) zero
-        , color (hex "000")
-        , fontSize (px 60)
-        , lineHeight (px 1)
-        ]
-
-
-viewHeader : Config -> Html msg
-viewHeader _ =
-    div []
-        []
+        Other ->
+            pageBox content
