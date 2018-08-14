@@ -1,57 +1,34 @@
-module Views.Page exposing (ActivePage(..), Config, frame)
+module Views.Page exposing (frame)
 
-import Html exposing (..)
-import Html.Attributes exposing (class, classList, href)
-import Data.Session exposing (Session)
-import Route
-
-
-type ActivePage
-    = Home
-    | Counter
-    | CurrentTime
-    | Other
+import Css exposing (..)
+import Data.Page exposing (ActivePage(..), Config)
+import Html.Styled exposing (..)
+import Html.Styled.Attributes exposing (css)
+import Views.Layout as Layout
+import Views.Theme exposing (Element, defaultCss, identify)
 
 
-type alias Config =
-    { session : Session
-    , activePage : ActivePage
-    }
+identify_ : String -> Style
+identify_ string =
+    "Views.Ui.Page."
+        ++ string
+        |> identify
+
+
+wrap : Html msg -> Html msg
+wrap content =
+    div [ css [ identify_ "wrap" ] ] [ defaultCss, content ]
 
 
 frame : Config -> Html msg -> Html msg
-frame ({ activePage, session } as config) content =
-    div
-        [ classList
-            [ ( "page-home", activePage == Home )
-            , ( "page-counter", activePage == Counter )
-            , ( "page-current-time", activePage == CurrentTime )
-            ]
-        ]
-        [ div [ class "page-content" ] [ content ]
-        ]
+frame config content =
+    case config.activePage of
+        Home ->
+            Layout.home config content
+                |> wrap
 
+        Login ->
+            wrap content
 
-viewHeader : Config -> Html msg
-viewHeader { session, activePage } =
-    let
-        navEntry page route label =
-            li [ classList [ ( "is-active", page == activePage ) ] ]
-                [ a [ Route.href route ] [ text label ] ]
-    in
-        div [ class "header" ]
-            [ h1 [] [ text "elm-kitchen" ]
-            , div [ class "tabs is-centered is-medium is-fullwidth" ]
-                [ ul []
-                    [ navEntry Home Route.Home "Home"
-                    , navEntry Counter Route.Counter "Counter"
-                    , navEntry CurrentTime Route.CurrentTime "Current time"
-                    ]
-                ]
-            , a
-                [ Html.Attributes.target "_blank"
-                , class "github-link"
-                , href "https://github.com/allo-media/elm-kitchen"
-                ]
-                [ text "Github" ]
-            ]
+        Other ->
+            wrap content

@@ -1,11 +1,11 @@
 module Main exposing (main)
 
+import Data.Page exposing (ActivePage(..), Config)
 import Data.Session exposing (Session)
-import Html exposing (..)
+import Html.Styled as Html exposing (..)
 import Navigation exposing (Location)
 import Page.Home as Home
-import Page.Counter as Counter
-import Page.CurrentTime as CurrentTime
+import Page.Login as Login
 import Route exposing (Route)
 import Views.Page as Page
 
@@ -17,8 +17,7 @@ type alias Flags =
 type Page
     = Blank
     | HomePage Home.Model
-    | Counter Counter.Model
-    | CurrentTime CurrentTime.Model
+    | LoginPage Login.Model
     | NotFound
 
 
@@ -30,8 +29,7 @@ type alias Model =
 
 type Msg
     = HomeMsg Home.Msg
-    | CounterMsg Counter.Msg
-    | CurrentTimeMsg CurrentTime.Msg
+    | LoginMsg Login.Msg
     | SetRoute (Maybe Route)
 
 
@@ -46,39 +44,30 @@ setRoute maybeRoute model =
                 ( homeModel, homeCmds ) =
                     Home.init model.session
             in
-                { model | page = HomePage homeModel }
-                    ! [ Cmd.map HomeMsg homeCmds ]
+            { model | page = HomePage homeModel }
+                ! [ Cmd.map HomeMsg homeCmds ]
 
-        Just Route.Counter ->
+        Just Route.Login ->
             let
-                ( counterModel, counterCmds ) =
-                    -- FIXME: pass session
-                    Counter.init
+                ( loginModel, loginCmds ) =
+                    Login.init model.session
             in
-                { model | page = Counter counterModel }
-                    ! [ Cmd.map CounterMsg counterCmds ]
-
-        Just Route.CurrentTime ->
-            let
-                ( currentTimeModel, currentTimeCmds ) =
-                    CurrentTime.init model.session
-            in
-                { model | page = CurrentTime currentTimeModel }
-                    ! [ Cmd.map CurrentTimeMsg currentTimeCmds ]
+            { model | page = LoginPage loginModel }
+                ! [ Cmd.map LoginMsg loginCmds ]
 
 
 init : Flags -> Location -> ( Model, Cmd Msg )
-init flags location =
+init _ location =
     let
         -- you'll usually want to retrieve and decode serialized session
         -- information from flags here
         session =
             {}
     in
-        setRoute (Route.fromLocation location)
-            { page = Blank
-            , session = session
-            }
+    setRoute (Route.fromLocation location)
+        { page = Blank
+        , session = session
+        }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -89,27 +78,24 @@ update msg ({ page, session } as model) =
                 ( newModel, newCmd ) =
                     subUpdate subMsg subModel
             in
-                { model | page = toModel newModel }
-                    ! [ Cmd.map toMsg newCmd ]
+            { model | page = toModel newModel }
+                ! [ Cmd.map toMsg newCmd ]
     in
-        case ( msg, page ) of
-            ( SetRoute route, _ ) ->
-                setRoute route model
+    case ( msg, page ) of
+        ( SetRoute route, _ ) ->
+            setRoute route model
 
-            ( HomeMsg homeMsg, HomePage homeModel ) ->
-                toPage HomePage HomeMsg (Home.update session) homeMsg homeModel
+        ( HomeMsg homeMsg, HomePage homeModel ) ->
+            toPage HomePage HomeMsg (Home.update session) homeMsg homeModel
 
-            ( CounterMsg counterMsg, Counter counterModel ) ->
-                toPage Counter CounterMsg (Counter.update session) counterMsg counterModel
+        ( LoginMsg loginMsg, LoginPage loginModel ) ->
+            toPage LoginPage LoginMsg (Login.update session) loginMsg loginModel
 
-            ( CurrentTimeMsg currentTimeMsg, CurrentTime currentTimeModel ) ->
-                toPage CurrentTime CurrentTimeMsg (CurrentTime.update session) currentTimeMsg currentTimeModel
+        ( _, NotFound ) ->
+            { model | page = NotFound } ! []
 
-            ( _, NotFound ) ->
-                { model | page = NotFound } ! []
-
-            ( _, _ ) ->
-                model ! []
+        ( _, _ ) ->
+            model ! []
 
 
 subscriptions : Model -> Sub Msg
@@ -118,12 +104,8 @@ subscriptions model =
         HomePage _ ->
             Sub.none
 
-        Counter _ ->
+        LoginPage _ ->
             Sub.none
-
-        CurrentTime model ->
-            CurrentTime.subscriptions model
-                |> Sub.map CurrentTimeMsg
 
         NotFound ->
             Sub.none
@@ -136,38 +118,33 @@ view : Model -> Html Msg
 view model =
     let
         pageConfig =
-            Page.Config model.session
+            Config model.session
     in
-        case model.page of
-            HomePage homeModel ->
-                Home.view model.session homeModel
-                    |> Html.map HomeMsg
-                    |> Page.frame (pageConfig Page.Home)
+    case model.page of
+        HomePage homeModel ->
+            Home.view model.session homeModel
+                |> Html.map HomeMsg
+                |> Page.frame (pageConfig Home)
 
-            Counter counterModel ->
-                Counter.view model.session counterModel
-                    |> Html.map CounterMsg
-                    |> Page.frame (pageConfig Page.Counter)
+        LoginPage loginModel ->
+            Login.view model.session loginModel
+                |> Html.map LoginMsg
+                |> Page.frame (pageConfig Other)
 
-            CurrentTime currentTimeModel ->
-                CurrentTime.view model.session currentTimeModel
-                    |> Html.map CurrentTimeMsg
-                    |> Page.frame (pageConfig Page.CurrentTime)
+        NotFound ->
+            Html.div [] [ Html.text "Not found" ]
+                |> Page.frame (pageConfig Other)
 
-            NotFound ->
-                Html.div [] [ Html.text "Not found" ]
-                    |> Page.frame (pageConfig Page.Other)
-
-            Blank ->
-                Html.text ""
-                    |> Page.frame (pageConfig Page.Other)
+        Blank ->
+            Html.text ""
+                |> Page.frame (pageConfig Other)
 
 
 main : Program Flags Model Msg
 main =
     Navigation.programWithFlags (Route.fromLocation >> SetRoute)
         { init = init
-        , view = view
+        , view = view >> Html.toUnstyled
         , update = update
         , subscriptions = subscriptions
         }
