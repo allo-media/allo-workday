@@ -2,6 +2,7 @@ module Page.Home exposing (Model, Msg(..), init, update, view)
 
 import Data.Session exposing (Session)
 import Html.Styled as Html exposing (..)
+import Views.Calendar as Calendar
 
 
 type alias Model =
@@ -26,4 +27,6 @@ update _ msg model =
 
 view : Session -> Model -> Html msg
 view _ model =
-    div [] []
+    div []
+        [ Calendar.view
+        ]

@@ -22,4 +22,15 @@ home config content =
             , property "grid-template-rows" "88px"
             ]
         ]
-        [ Header.view config, content ]
+        [ Header.view config
+        , div
+            [ css
+                [ paddingTop (px 60)
+                , property "display" "grid"
+                , property "grid-template-columns" "auto 1fr"
+                ]
+            ]
+            [ div [ css [ width (px 340) ] ] []
+            , content
+            ]
+        ]
