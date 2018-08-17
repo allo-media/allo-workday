@@ -1,4 +1,4 @@
-module Views.Calendar exposing (view)
+module Views.Calendar.Table exposing (view)
 
 import Css exposing (..)
 import Html.Styled as Html exposing (..)
@@ -44,7 +44,8 @@ cellWorkDay =
 dayNumber : Element msg
 dayNumber =
     styled span
-        [ position absolute
+        [ identify_ "dayNumber"
+        , position absolute
         , top (px 14)
         , right (px 21)
         , fontSize (Css.rem 1.5)
@@ -56,7 +57,8 @@ dayNumber =
 dayNumberStrong : Element msg
 dayNumberStrong =
     styled span
-        [ position absolute
+        [ identify_ "dayNumberStrong"
+        , position absolute
         , top (px 14)
         , right (px 21)
         , fontSize (Css.rem 1.5)
@@ -83,7 +85,8 @@ headTable : String -> Html msg
 headTable month =
     caption
         [ css
-            [ backgroundColor (rgb 255 255 255)
+            [ identify_ "headTable"
+            , backgroundColor (rgb 255 255 255)
             , height (px 70)
             , color (rgb 223 82 99)
             , fontSize (Css.rem 1.25)
@@ -114,10 +117,10 @@ table =
         ]
 
 
-weakNumberLabel : Element msg
-weakNumberLabel =
+weekNumberLabel : Element msg
+weekNumberLabel =
     styled span
-        [ identify_ "weakNumberLabel"
+        [ identify_ "weekNumberLabel"
         , position absolute
         , left (px (negate 31))
         , bottom zero
@@ -154,23 +157,19 @@ view =
                 ]
             , tr []
                 [ cell []
-                    [ weakNumberLabel [] [ text "S21" ]
+                    [ weekNumberLabel [] [ text "S21" ]
                     , dayNumber [] [ text "1" ]
                     ]
                 , cell [] [ dayNumber [] [ text "2" ] ]
                 , cell []
-                    [ dayNumber [] [ text "3" ]
+                    [ weekNumberLabel [] [ text "S21" ]
+                    , dayNumber [] [ text "3" ]
                     , div
                         [ css
                             [ position absolute
                             , bottom zero
                             , displayFlex
                             , width (pct 100)
-
-                            -- , property "display" "grid"
-                            -- , property "grid-auto-flow" "column"
-                            -- , width (pct 100)
-                            -- , property "grid-template-columns" "50%"
                             ]
                         ]
                         [ Tags.rtt [] [ text "rtt" ]
@@ -196,7 +195,7 @@ view =
                 ]
             , tr []
                 [ cellWorkDay []
-                    [ weakNumberLabel [] [ text "S21" ]
+                    [ weekNumberLabel [] [ text "S21" ]
                     , dayNumber [] [ text "8" ]
                     ]
                 , cellWorkDay [] [ dayNumber [] [ text "9" ] ]
@@ -208,7 +207,7 @@ view =
                 ]
             , tr []
                 [ cellWorkDay []
-                    [ weakNumberLabel [] [ text "S21" ]
+                    [ weekNumberLabel [] [ text "S21" ]
                     , dayNumber [] [ text "1" ]
                     ]
                 , cellWorkDay [] [ dayNumber [] [ text "2" ] ]
@@ -220,7 +219,7 @@ view =
                 ]
             , tr []
                 [ cellWorkDay []
-                    [ weakNumberLabel [] [ text "S21" ]
+                    [ weekNumberLabel [] [ text "S21" ]
                     , dayNumber [] [ text "1" ]
                     ]
                 , cellWorkDay [] [ dayNumber [] [ text "2" ] ]
