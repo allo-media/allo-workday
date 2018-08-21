@@ -4,6 +4,7 @@ import Data.Page exposing (ActivePage(..), Config)
 import Data.Session exposing (Session)
 import Html.Styled as Html exposing (..)
 import Navigation exposing (Location)
+import Page.Calendar as Calendar
 import Page.Home as Home
 import Page.Login as Login
 import Route exposing (Route)
@@ -18,6 +19,7 @@ type Page
     = Blank
     | HomePage Home.Model
     | LoginPage Login.Model
+    | CalendarPage Calendar.Model
     | NotFound
 
 
@@ -29,6 +31,7 @@ type alias Model =
 
 type Msg
     = HomeMsg Home.Msg
+    | CalendarMsg Calendar.Msg
     | LoginMsg Login.Msg
     | SetRoute (Maybe Route)
 
@@ -46,6 +49,13 @@ setRoute maybeRoute model =
             in
             { model | page = HomePage homeModel }
                 ! [ Cmd.map HomeMsg homeCmds ]
+
+        Just (Route.Calendar year month) ->
+            let
+                ( calendarModel, calendarCmds ) =
+                    Calendar.init year month model.session
+            in
+            { model | page = CalendarPage calendarModel } ! [ Cmd.map CalendarMsg calendarCmds ]
 
         Just Route.Login ->
             let
@@ -85,6 +95,9 @@ update msg ({ page, session } as model) =
         ( SetRoute route, _ ) ->
             setRoute route model
 
+        ( CalendarMsg calendarMsg, CalendarPage calendarModel ) ->
+            toPage CalendarPage CalendarMsg (Calendar.update session) calendarMsg calendarModel
+
         ( HomeMsg homeMsg, HomePage homeModel ) ->
             toPage HomePage HomeMsg (Home.update session) homeMsg homeModel
 
@@ -102,6 +115,9 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     case model.page of
         HomePage _ ->
+            Sub.none
+
+        CalendarPage _ ->
             Sub.none
 
         LoginPage _ ->
@@ -125,6 +141,11 @@ view model =
             Home.view model.session homeModel
                 |> Html.map HomeMsg
                 |> Page.frame (pageConfig Home)
+
+        CalendarPage calendarModel ->
+            Calendar.view model.session calendarModel
+                |> Html.map CalendarMsg
+                |> Page.frame (pageConfig Calendar)
 
         LoginPage loginModel ->
             Login.view model.session loginModel

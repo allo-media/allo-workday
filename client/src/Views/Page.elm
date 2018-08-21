@@ -27,6 +27,10 @@ frame config content =
             Layout.home config content
                 |> wrap
 
+        Calendar ->
+            Layout.home config content
+                |> wrap
+
         Login ->
             wrap content
 
