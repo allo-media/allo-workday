@@ -9,6 +9,13 @@ import List.Extra as LE
 import Views.Theme exposing (Element, identify, theme)
 
 
+identify_ : String -> Style
+identify_ string =
+    "Views.Calendar.Grid."
+        ++ string
+        |> identify
+
+
 dateRange : Int -> Month -> List Date
 dateRange year month =
     range Day 1 (fromCalendarDate year month 1) (fromCalendarDate year month 31)
@@ -50,9 +57,10 @@ dates year month =
 grid : Element msg
 grid =
     styled div
-        [ property "display" "grid"
+        [ identify_ "grid"
+        , property "display" "grid"
         , property "grid-template-columns" "repeat(7, 14.2%)"
-        , property "grid-template-rows" "70px 70px repeat(4, 149px)"
+        , property "grid-template-rows" "70px 70px repeat(5, 149px)"
         , justifyContent flexEnd
         , margin (px 20)
         , boxShadow5 (px 9) (px 7) (px 5) zero (rgba 0 0 0 0.06)
@@ -66,7 +74,7 @@ grid =
 cell : Element msg
 cell =
     styled div
-        [ height (px 149)
+        [ identify_ "cell"
         , boxSizing borderBox
         , border3 (px 1) solid (hex "F1F1F1")
         ]
@@ -79,7 +87,8 @@ cell =
 dayNumber : Element msg
 dayNumber =
     styled div
-        [ position absolute
+        [ identify_ "dayNumber"
+        , position absolute
         , top (px 14)
         , right (px 21)
         , fontSize (Css.rem 1.5)
@@ -91,25 +100,49 @@ dayNumber =
 {- Day block -}
 
 
+sunday : Style
+sunday =
+    Css.batch
+        [ identify_ "sunday"
+        , position relative
+        , backgroundColor (rgb 195 195 195)
+        ]
+
+
+workingDay : Style
+workingDay =
+    Css.batch
+        [ identify_ "workingDay"
+        , position relative
+        , backgroundColor (rgb 255 255 255)
+        ]
+
+
+lastMonthWorkingDay : Style
+lastMonthWorkingDay =
+    Css.batch
+        [ identify_ "lastMonthDay"
+        , position relative
+        , backgroundColor (hex "FBFBFB")
+        ]
+
+
 day : Month -> Date -> Html msg
 day month date =
     let
         cellDay =
             case dayOfWeek date of
                 Sun ->
-                    if month == Date.month date then
-                        backgroundColor (rgb 195 195 195)
-                    else
-                        backgroundColor (hex "FBFBFB")
+                    sunday
 
                 _ ->
                     if month == Date.month date then
-                        backgroundColor (rgb 255 255 255)
+                        workingDay
                     else
-                        backgroundColor (hex "FBFBFB")
+                        lastMonthWorkingDay
     in
     cell
-        [ css [ position relative, cellDay ] ]
+        [ css [ cellDay ] ]
         [ dayNumber [ css [ opacity (num 0.35) ] ] [ text (toString (Date.day date)) ]
         ]
 
@@ -118,7 +151,8 @@ head : Int -> Month -> Html msg
 head year month =
     div
         [ css
-            [ property "grid-column" "1 / 8"
+            [ identify_ "head"
+            , property "grid-column" "1 / 8"
             , backgroundColor (hex "FFF")
             , property "display" "grid"
             , property "grid-template-columns" "1fr auto 1fr"
@@ -140,7 +174,8 @@ dayLabel : String -> Html msg
 dayLabel dayLabel =
     div
         [ css
-            [ backgroundColor (rgb 116 107 222)
+            [ identify_ "dayLabel"
+            , backgroundColor (rgb 116 107 222)
             , border3 (px 1) solid (rgb 106 98 203)
             , color (rgb 255 255 255)
             , textTransform uppercase

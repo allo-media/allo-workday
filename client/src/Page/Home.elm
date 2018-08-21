@@ -31,6 +31,4 @@ update _ msg model =
 
 view : Session -> Model -> Html msg
 view _ model =
-    div []
-        [ GridCalendar.view 2018 Date.Jun
-        ]
+    div [] [ GridCalendar.view 2018 Date.Aug ]
