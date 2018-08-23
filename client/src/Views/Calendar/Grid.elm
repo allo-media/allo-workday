@@ -153,7 +153,7 @@ day month date =
 
 weekNumberLabel : Date -> Html msg
 weekNumberLabel date =
-    case dayOfWeek date of
+    case dayOfWeek date |> Debug.log "Day" of
         Mon ->
             span
                 [ css

@@ -10,6 +10,7 @@ type Route
     = Home
     | Login
     | Calendar Int String
+    | Ui
 
 
 
@@ -22,6 +23,7 @@ route =
         [ Url.map Home Url.top
         , Url.map Login (s "login")
         , Url.map Calendar (s "calendar" </> Url.int </> Url.string)
+        , Url.map Ui (s "ui")
         ]
 
 
@@ -51,6 +53,9 @@ routeToString route =
 
                 Calendar year month ->
                     [ "calendar", toString year, month ]
+
+                Ui ->
+                    [ "ui" ]
     in
     "#/" ++ String.join "/" pieces
 

@@ -1,4 +1,4 @@
-module Views.Ui.Input exposing (..)
+module Views.Ui.Input exposing (fullWidth, medium, small)
 
 import Css exposing (..)
 import Html.Styled exposing (..)
@@ -10,9 +10,9 @@ identify_ string =
     "Views.UI.Input." ++ string |> identify
 
 
-default : Element msg
+default : Style
 default =
-    styled input
+    Css.batch
         [ identify_ "default"
         , borderRadius (px 2.2)
         , backgroundColor (hex "e5e9ed")
@@ -26,18 +26,28 @@ default =
         ]
 
 
+small : Element msg
+small =
+    styled input
+        [ default
+        , identify_ "small"
+        , width (pct 25)
+        ]
+
+
 medium : Element msg
 medium =
-    styled default
-        [ identify_ "medium"
+    styled input
+        [ default
+        , identify_ "medium"
         , width (pct 50)
-        , textAlign center
         ]
 
 
 fullWidth : Element msg
 fullWidth =
-    styled default
-        [ identify_ "fullWidth"
+    styled input
+        [ default
+        , identify_ "fullWidth"
         , width (pct 100)
         ]

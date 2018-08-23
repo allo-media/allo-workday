@@ -7,6 +7,7 @@ import Navigation exposing (Location)
 import Page.Calendar as Calendar
 import Page.Home as Home
 import Page.Login as Login
+import Page.Ui as Ui
 import Route exposing (Route)
 import Views.Page as Page
 
@@ -21,6 +22,7 @@ type Page
     | LoginPage Login.Model
     | CalendarPage Calendar.Model
     | NotFound
+    | Ui
 
 
 type alias Model =
@@ -41,6 +43,9 @@ setRoute maybeRoute model =
     case maybeRoute of
         Nothing ->
             { model | page = NotFound } ! []
+
+        Just Route.Ui ->
+            { model | page = Ui } ! []
 
         Just Route.Home ->
             let
@@ -126,6 +131,9 @@ subscriptions model =
         NotFound ->
             Sub.none
 
+        Ui ->
+            Sub.none
+
         Blank ->
             Sub.none
 
@@ -150,6 +158,10 @@ view model =
         LoginPage loginModel ->
             Login.view model.session loginModel
                 |> Html.map LoginMsg
+                |> Page.frame (pageConfig Other)
+
+        Ui ->
+            Ui.view
                 |> Page.frame (pageConfig Other)
 
         NotFound ->
