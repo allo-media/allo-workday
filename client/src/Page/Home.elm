@@ -1,7 +1,12 @@
 module Page.Home exposing (Model, Msg(..), init, update, view)
 
 import Data.Session exposing (Session)
+import Date exposing (Month)
 import Html.Styled as Html exposing (..)
+import Views.Calendar.Grid as GridCalendar
+
+
+-- import Views.Calendar.Table as TableCalendar
 
 
 type alias Model =
@@ -26,4 +31,4 @@ update _ msg model =
 
 view : Session -> Model -> Html msg
 view _ model =
-    div [] []
+    GridCalendar.view 2018 Date.Jan

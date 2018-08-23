@@ -10,9 +10,9 @@ identify_ string =
     "Views.UI.Button." ++ string |> identify
 
 
-default : Element msg
+default : Style
 default =
-    styled button
+    Css.batch
         [ identify_ "default"
         , fontSize (Css.rem 1)
         , textAlign center
@@ -25,8 +25,9 @@ default =
 
 primary : Element msg
 primary =
-    styled default
-        [ identify_ "primary"
+    styled button
+        [ default
+        , identify_ "primary"
         , backgroundColor (rgba 116 107 222 1)
         ]
 
@@ -41,5 +42,5 @@ primaryFullWidth =
 
 secondary : Element msg
 secondary =
-    styled default
+    styled button
         [ identify_ "secondary" ]

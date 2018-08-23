@@ -5,6 +5,7 @@ import Data.Page exposing (Config)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (css)
 import Views.Header as Header
+import Views.Sidebar as Sidebar
 import Views.Theme exposing (Element, identify, theme)
 
 
@@ -22,4 +23,15 @@ home config content =
             , property "grid-template-rows" "88px"
             ]
         ]
-        [ Header.view config, content ]
+        [ Header.view config
+        , div
+            [ css
+                [ paddingTop (px 60)
+                , property "display" "grid"
+                , property "grid-template-columns" "auto 1fr"
+                ]
+            ]
+            [ Sidebar.view
+            , content
+            ]
+        ]

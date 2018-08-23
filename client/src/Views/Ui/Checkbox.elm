@@ -2,7 +2,7 @@ module Views.Ui.Checkbox exposing (..)
 
 import Css exposing (..)
 import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (..)
+import Html.Styled.Attributes as Attr exposing (..)
 import Views.Theme exposing (Element, identify, theme)
 
 
@@ -15,3 +15,4 @@ default : Element msg
 default =
     styled input
         []
+        [ Attr.fromUnstyled (type_ "checkbox") ]

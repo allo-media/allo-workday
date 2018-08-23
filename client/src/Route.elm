@@ -3,12 +3,18 @@ module Route exposing (Route(..), fromLocation, href, modifyUrl)
 import Html.Styled exposing (Attribute)
 import Html.Styled.Attributes as Attr
 import Navigation exposing (Location)
-import UrlParser as Url exposing (Parser, s)
+import UrlParser as Url exposing ((</>), Parser, s)
 
 
 type Route
     = Home
     | Login
+    | Calendar Int String
+    | Ui
+
+
+
+-- | Calendar
 
 
 route : Parser (Route -> a) a
@@ -16,6 +22,8 @@ route =
     Url.oneOf
         [ Url.map Home Url.top
         , Url.map Login (s "login")
+        , Url.map Calendar (s "calendar" </> Url.int </> Url.string)
+        , Url.map Ui (s "ui")
         ]
 
 
@@ -42,6 +50,12 @@ routeToString route =
 
                 Login ->
                     [ "login" ]
+
+                Calendar year month ->
+                    [ "calendar", toString year, month ]
+
+                Ui ->
+                    [ "ui" ]
     in
     "#/" ++ String.join "/" pieces
 

@@ -6,6 +6,7 @@ import Data.Session exposing (Session)
 type ActivePage
     = Home
     | Login
+    | Calendar
     | Other
 
 
