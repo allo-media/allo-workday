@@ -1,5 +1,7 @@
-module Views.Theme exposing (Element, defaultCss, defaultFont, identify, theme)
+module Views.Theme exposing (Element, darken, defaultCss, defaultFont, identify, theme)
 
+import Color
+import Color.Mixing as CM
 import Css exposing (..)
 import Css.Foreign exposing (body, everything, global, html, img)
 import Html.Styled exposing (Attribute, Html)
@@ -15,6 +17,27 @@ type alias Theme =
 
 type alias Element msg =
     List (Attribute msg) -> List (Html msg) -> Html msg
+
+
+darken : Float -> Css.Color -> Css.Color
+darken ratio cssColor =
+    let
+        { red, green, blue, alpha } =
+            cssColor
+
+        newColor =
+            Color.rgba red green blue alpha |> CM.darken ratio
+    in
+    newColor |> toCssColor
+
+
+toCssColor : Color.Color -> Css.Color
+toCssColor color =
+    let
+        { red, green, blue, alpha } =
+            Color.toRgb color
+    in
+    Css.rgba red green blue alpha
 
 
 defaultFont : Style
@@ -58,7 +81,7 @@ identify styleName =
 
 theme : Theme
 theme =
-    { primaryColor = rgb 130 97 230
+    { primaryColor = rgba 130 97 230 1.0
     , primaryBgColor = rgba 236 241 247 1
     , primaryBgImageGradient =
         backgroundImage

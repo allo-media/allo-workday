@@ -1,36 +1,13 @@
 module Views.Ui.Button exposing (primary, primaryFullWidth, secondary)
 
-import Color exposing (Color)
-import Color.Mixing as CM
-import Css exposing (..)
+import Css as Css exposing (..)
 import Html.Styled exposing (button, styled)
-import Views.Theme exposing (Element, identify, theme)
+import Views.Theme as VT exposing (Element, darken, identify, theme)
 
 
 identify_ : String -> Style
 identify_ string =
     "Views.UI.Button." ++ string |> identify
-
-
-darken : Float -> Css.Color -> Css.Color
-darken ratio cssColor =
-    let
-        { red, green, blue, alpha } =
-            cssColor
-
-        newColor =
-            Color.rgba red green blue alpha |> CM.darken ratio
-    in
-    newColor |> toCssColor
-
-
-toCssColor : Css.Color -> Css.Color
-toCssColor color =
-    let
-        { red, green, blue, alpha } =
-            Color.toRgb color
-    in
-    Css.rgba red green blue alpha
 
 
 default : Style
@@ -56,7 +33,7 @@ primary =
         , backgroundImage <|
             linearGradient
                 (stop <| theme.primaryColor)
-                (stop <| CM.darken 0.5 theme.primaryColor)
+                (stop <| VT.darken 0.5 theme.primaryColor)
                 []
         , hover
             [ backgroundColor (rgb 98 89 210)
