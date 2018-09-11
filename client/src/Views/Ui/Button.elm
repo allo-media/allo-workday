@@ -1,4 +1,4 @@
-module Views.Ui.Button exposing (primary, primaryFullWidth, secondary)
+module Views.Ui.Button exposing (danger, default, primary, primaryFullWidth, secondary, warning)
 
 import Css as Css exposing (..)
 import Html.Styled exposing (button, styled)
@@ -10,34 +10,71 @@ identify_ string =
     "Views.UI.Button." ++ string |> identify
 
 
-default : Style
-default =
+styleDefault : Style
+styleDefault =
     Css.batch
-        [ identify_ "default"
+        [ identify_ "styleDefault"
         , textAlign center
         , color (hex "FFF")
         , border (px 0)
         , padding2 (px 12) (px 18)
         , fontWeight (int 800)
-        , borderRadius (px 5)
+        , borderRadius (px 3)
         , cursor pointer
         , outline none
+        ]
+
+
+default : Element msg
+default =
+    styled button
+        [ styleDefault
+        , identify_ "default"
+        , background (rgba 242 244 247 1) 0.1
+        , color (VT.darken 0.6 (rgba 242 244 247 1))
+        ]
+
+
+background : Color -> Float -> Style
+background color ratio =
+    Css.batch
+        [ backgroundImage <|
+            linearGradient
+                (stop <| color)
+                (stop <| VT.darken ratio color)
+                []
+        , hover
+            [ backgroundImage <|
+                linearGradient
+                    (stop <| VT.darken (ratio / 2) color)
+                    (stop <| VT.darken (ratio * 1.1) color)
+                    []
+            ]
+        , active
+            [ backgroundImage <|
+                linearGradient
+                    (stop <| VT.darken (ratio / 2) color)
+                    (stop <| VT.darken (ratio * 1.5) color)
+                    []
+            ]
+        ]
+
+
+danger : Element msg
+danger =
+    styled button
+        [ styleDefault
+        , identify_ "danger"
+        , background theme.dangerColor 0.1
         ]
 
 
 primary : Element msg
 primary =
     styled button
-        [ default
+        [ styleDefault
         , identify_ "primary"
-        , backgroundImage <|
-            linearGradient
-                (stop <| theme.primaryColor)
-                (stop <| VT.darken 0.5 theme.primaryColor)
-                []
-        , hover
-            [ backgroundColor (rgb 98 89 210)
-            ]
+        , background theme.primaryColor 0.1
         ]
 
 
@@ -53,3 +90,12 @@ secondary : Element msg
 secondary =
     styled button
         [ identify_ "secondary" ]
+
+
+warning : Element msg
+warning =
+    styled button
+        [ styleDefault
+        , identify_ "warning"
+        , background theme.warningColor 0.05
+        ]

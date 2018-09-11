@@ -10,6 +10,10 @@ identify_ string =
     "Views.UI.Typograhy." ++ string |> identify
 
 
+
+-- Heading
+
+
 heading : Element msg
 heading =
     styled h1

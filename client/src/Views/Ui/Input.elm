@@ -1,8 +1,8 @@
-module Views.Ui.Input exposing (fullWidth, invalid, medium, small, valid)
+module Views.Ui.Input exposing (default, fullWidth, invalid, medium, small, valid)
 
 import Css exposing (..)
 import Html.Styled exposing (..)
-import Views.Theme exposing (Element, defaultFont, identify, theme)
+import Views.Theme exposing (Element, defaultFont, formStyle, identify, placeHolder, theme)
 
 
 identify_ : String -> Style
@@ -10,33 +10,18 @@ identify_ string =
     "Views.UI.Input." ++ string |> identify
 
 
-default : Style
+default : Element msg
 default =
-    Css.batch
-        [ identify_ "default"
-        , borderRadius (px 5)
-        , backgroundColor (hex "fff")
-        , border3 (px 2) solid (rgba 208 208 208 0.5)
-        , padding2 (px 10) (px 13)
-        , marginBottom (px 10)
-        , outline none
-        , hover
-            [ borderColor (rgba 208 208 208 0.8)
-            ]
-        , focus
-            [ borderColor (hex "2ea2f8")
-            ]
-        , disabled
-            [ backgroundColor (hex "e9edf1")
-            , borderColor (hex "dfe3e9")
-            ]
+    styled input
+        [ formStyle
+        , identify_ "default"
         ]
 
 
 small : Element msg
 small =
     styled input
-        [ default
+        [ formStyle
         , identify_ "small"
         , width (pct 25)
         ]
@@ -45,7 +30,7 @@ small =
 medium : Element msg
 medium =
     styled input
-        [ default
+        [ formStyle
         , identify_ "medium"
         , width (pct 50)
         ]
@@ -54,7 +39,7 @@ medium =
 fullWidth : Element msg
 fullWidth =
     styled input
-        [ default
+        [ formStyle
         , identify_ "fullWidth"
         , width (pct 100)
         ]
@@ -63,7 +48,7 @@ fullWidth =
 valid : Element msg
 valid =
     styled input
-        [ default
+        [ formStyle
         , identify_ "valid"
         , borderColor (hex "1bb934")
         , color (hex "1bb934")
@@ -76,11 +61,11 @@ valid =
 invalid : Element msg
 invalid =
     styled input
-        [ default
+        [ formStyle
         , identify_ "invalid"
-        , borderColor (hex "ed1c24")
-        , color (hex "ed1c24")
+        , borderColor theme.dangerColor
+        , color theme.dangerColor
         , hover
-            [ borderColor (hex "ed1c24")
+            [ borderColor theme.dangerColor
             ]
         ]
