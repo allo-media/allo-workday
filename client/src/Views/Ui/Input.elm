@@ -1,8 +1,8 @@
-module Views.Ui.Input exposing (fullWidth, medium, small)
+module Views.Ui.Input exposing (fullWidth, invalid, medium, small, valid)
 
 import Css exposing (..)
 import Html.Styled exposing (..)
-import Views.Theme exposing (Element, identify)
+import Views.Theme exposing (Element, defaultFont, identify, theme)
 
 
 identify_ : String -> Style
@@ -14,15 +14,22 @@ default : Style
 default =
     Css.batch
         [ identify_ "default"
-        , borderRadius (px 2.2)
-        , backgroundColor (hex "e5e9ed")
-        , border3 (px 0.6) solid (rgba 208 208 208 0.5)
-        , padding2 (px 14) zero
-        , margin2 (px 10) auto
-        , color (rgba 120 126 140 1)
-        , fontSize (Css.rem 1.125)
-        , textIndent (px 14)
+        , borderRadius (px 5)
+        , backgroundColor (hex "fff")
+        , border3 (px 2) solid (rgba 208 208 208 0.5)
+        , padding2 (px 10) (px 13)
+        , marginBottom (px 10)
         , outline none
+        , hover
+            [ borderColor (rgba 208 208 208 0.8)
+            ]
+        , focus
+            [ borderColor (hex "2ea2f8")
+            ]
+        , disabled
+            [ backgroundColor (hex "e9edf1")
+            , borderColor (hex "dfe3e9")
+            ]
         ]
 
 
@@ -50,4 +57,30 @@ fullWidth =
         [ default
         , identify_ "fullWidth"
         , width (pct 100)
+        ]
+
+
+valid : Element msg
+valid =
+    styled input
+        [ default
+        , identify_ "valid"
+        , borderColor (hex "1bb934")
+        , color (hex "1bb934")
+        , hover
+            [ borderColor (hex "1bb934")
+            ]
+        ]
+
+
+invalid : Element msg
+invalid =
+    styled input
+        [ default
+        , identify_ "invalid"
+        , borderColor (hex "ed1c24")
+        , color (hex "ed1c24")
+        , hover
+            [ borderColor (hex "ed1c24")
+            ]
         ]

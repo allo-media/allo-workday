@@ -1,4 +1,4 @@
-module Views.Ui.Typography exposing (..)
+module Views.Ui.Typography exposing (heading, headingLogin, identify_, primaryHeaderText)
 
 import Css exposing (..)
 import Html.Styled exposing (h1, p, styled)

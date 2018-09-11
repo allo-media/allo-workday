@@ -1,7 +1,7 @@
-module Views.Theme exposing (Element, defaultCss, identify, theme)
+module Views.Theme exposing (Element, defaultCss, defaultFont, identify, theme)
 
 import Css exposing (..)
-import Css.Foreign exposing (body, global, html, img)
+import Css.Foreign exposing (body, everything, global, html, img)
 import Html.Styled exposing (Attribute, Html)
 
 
@@ -15,6 +15,17 @@ type alias Theme =
 
 type alias Element msg =
     List (Attribute msg) -> List (Html msg) -> Html msg
+
+
+defaultFont : Style
+defaultFont =
+    Css.batch
+        [ identify "Views.Theme.defaultFont"
+        , color (hex "354052")
+        , fontFamilies theme.fonts
+        , fontWeight (int 600)
+        , letterSpacing (px 0.3)
+        ]
 
 
 defaultCss : Html msg
@@ -31,9 +42,11 @@ defaultCss =
             , width (pct 100)
             , height (pct 100)
             , fontFamilies theme.fonts
-            , color theme.primaryColor
-            , fontSize (px 16)
             , backgroundColor theme.primaryBgColor
+            ]
+        , everything
+            [ boxSizing borderBox
+            , defaultFont
             ]
         ]
 
@@ -45,7 +58,7 @@ identify styleName =
 
 theme : Theme
 theme =
-    { primaryColor = rgba 132 132 132 1
+    { primaryColor = rgb 130 97 230
     , primaryBgColor = rgba 236 241 247 1
     , primaryBgImageGradient =
         backgroundImage
