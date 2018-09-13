@@ -1,6 +1,7 @@
 module Views.Ui.Button exposing (danger, default, primary, primaryFullWidth, secondary, warning)
 
 import Css as Css exposing (..)
+import Css.Transitions exposing (easeInOut, transition)
 import Html.Styled exposing (button, styled)
 import Views.Theme as VT exposing (Element, darken, identify, theme)
 
@@ -16,12 +17,15 @@ styleDefault =
         [ identify_ "styleDefault"
         , textAlign center
         , color (hex "FFF")
-        , border (px 0)
+        , border zero
         , padding2 (px 12) (px 18)
-        , fontWeight (int 800)
+        , fontWeight (int 700)
         , borderRadius (px 3)
         , cursor pointer
         , outline none
+        , transition
+            [ Css.Transitions.background3 100 0 easeInOut
+            ]
         ]
 
 

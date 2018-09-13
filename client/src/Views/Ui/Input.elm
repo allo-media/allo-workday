@@ -2,7 +2,7 @@ module Views.Ui.Input exposing (default, fullWidth, invalid, medium, small, vali
 
 import Css exposing (..)
 import Html.Styled exposing (..)
-import Views.Theme exposing (Element, defaultFont, formStyle, identify, placeHolder, theme)
+import Views.Theme exposing (Element, formStyle, identify, placeHolder, theme)
 
 
 identify_ : String -> Style

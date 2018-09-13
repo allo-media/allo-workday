@@ -1,9 +1,10 @@
-module Views.Theme exposing (Element, darken, defaultCss, defaultFont, formStyle, identify, placeHolder, theme)
+module Views.Theme exposing (Element, darken, defaultCss, formStyle, identify, placeHolder, theme)
 
 import Color
 import Color.Mixing as CM
 import Css exposing (..)
 import Css.Foreign exposing (body, everything, global, html, img)
+import Css.Transitions exposing (easeInOut, transition)
 import Html.Styled exposing (Attribute, Html)
 
 
@@ -26,17 +27,6 @@ identify_ string =
     "Views.UI.Textarea." ++ string |> identify
 
 
-defaultFont : Style
-defaultFont =
-    Css.batch
-        [ identify "Views.Theme.defaultFont"
-        , color (hex "354052")
-        , fontFamilies theme.fonts
-        , fontWeight (int 600)
-        , letterSpacing (px 0.3)
-        ]
-
-
 defaultCss : Html msg
 defaultCss =
     global
@@ -44,6 +34,7 @@ defaultCss =
             [ identify "Views.Theme.defaultCss"
             , width (pct 100)
             , height (pct 100)
+            , fontSize (px 14)
             ]
         , body
             [ identify "Views.Theme.defaultCss"
@@ -52,10 +43,15 @@ defaultCss =
             , height (pct 100)
             , fontFamilies theme.fonts
             , backgroundColor theme.primaryBgColor
+            , color (hex "354052")
+            , fontFamilies theme.fonts
+            , fontWeight (int 500)
+            , lineHeight (pct 140)
+            , fontSize (Css.rem 1)
+            , letterSpacing (px 0.3)
             ]
         , everything
             [ boxSizing borderBox
-            , defaultFont
             ]
         ]
 
@@ -96,11 +92,16 @@ formStyle =
         , padding2 (px 10) (px 13)
         , marginBottom (px 10)
         , outline none
+        , color (hex "354052")
+        , fontWeight (int 500)
+        , transition
+            [ Css.Transitions.border3 100 0 easeInOut
+            ]
         , hover
             [ borderColor (rgba 208 208 208 0.8)
             ]
         , focus
-            [ borderColor (hex "2ea2f8")
+            [ borderColor theme.primaryColor
             ]
         , disabled
             [ backgroundColor (hex "e9edf1")

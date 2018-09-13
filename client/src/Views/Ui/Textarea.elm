@@ -2,7 +2,7 @@ module Views.Ui.Textarea exposing (default, fullWidth)
 
 import Css exposing (..)
 import Html.Styled exposing (..)
-import Views.Theme exposing (Element, defaultFont, formStyle, identify, placeHolder, theme)
+import Views.Theme exposing (Element, formStyle, identify, placeHolder, theme)
 
 
 identify_ : String -> Style
@@ -16,6 +16,7 @@ textareaStyle =
         [ resize vertical
         , verticalAlign top
         , minHeight (px 40)
+        , lineHeight (pct 140)
         ]
 
 
