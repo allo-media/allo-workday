@@ -1,8 +1,8 @@
-module Views.Ui.Button exposing (danger, default, primary, primaryFullWidth, secondary, warning)
+module Views.Ui.Button exposing (danger, default, multiple, multipleCenter, multipleRight, primary, primaryFullWidth, secondary, warning)
 
 import Css as Css exposing (..)
 import Css.Transitions exposing (easeInOut, transition)
-import Html.Styled exposing (button, styled)
+import Html.Styled exposing (button, div, styled)
 import Views.Theme as VT exposing (Element, darken, identify, theme)
 
 
@@ -64,6 +64,10 @@ background color ratio =
         ]
 
 
+
+-- Colors
+
+
 danger : Element msg
 danger =
     styled button
@@ -82,14 +86,6 @@ primary =
         ]
 
 
-primaryFullWidth : Element msg
-primaryFullWidth =
-    styled primary
-        [ identify_ "primaryFullWidth"
-        , width (pct 100)
-        ]
-
-
 secondary : Element msg
 secondary =
     styled button
@@ -102,4 +98,53 @@ warning =
         [ styleDefault
         , identify_ "warning"
         , background theme.warningColor 0.05
+        ]
+
+
+primaryFullWidth : Element msg
+primaryFullWidth =
+    styled primary
+        [ identify_ "primaryFullWidth"
+        , width (pct 100)
+        ]
+
+
+
+-- Multiple
+
+
+multipleStyle : Style
+multipleStyle =
+    Css.batch
+        [ identify_ "multipleStyle"
+        , property "display" "grid"
+        , property "grid-auto-flow" "column"
+        , property "grid-column-gap" "5px"
+        ]
+
+
+multiple : Element msg
+multiple =
+    styled div
+        [ identify_ "multiple"
+        , multipleStyle
+        , justifyContent left
+        ]
+
+
+multipleCenter : Element msg
+multipleCenter =
+    styled div
+        [ identify_ "multipleCenter"
+        , multipleStyle
+        , justifyContent center
+        ]
+
+
+multipleRight : Element msg
+multipleRight =
+    styled div
+        [ identify_ "multipleRight"
+        , multipleStyle
+        , justifyContent right
         ]
