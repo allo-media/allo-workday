@@ -2,7 +2,7 @@ module Page.Ui exposing (default, identify_, view)
 
 import Css exposing (..)
 import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (..)
+import Html.Styled.Attributes as Attribute exposing (..)
 import Views.Theme exposing (identify)
 import Views.Ui.Button as Button
 import Views.Ui.Input as Input
@@ -31,25 +31,17 @@ view =
         , div []
             [ h2 [] [ text "Inputs" ]
             , Input.default [ placeholder "Default" ] []
-            , br [] []
             , Input.valid [ placeholder "Valid" ] []
-            , br [] []
             , Input.invalid [ placeholder "Invalid" ] []
-            , br [] []
-            , Input.invalid [ Html.Styled.Attributes.disabled True, placeholder "Disabled" ] []
-            , br [] []
+            , Input.invalid [ Attribute.disabled True, placeholder "Disabled" ] []
             , Input.small [ placeholder "Small" ] []
-            , br [] []
             , Input.medium [ placeholder "Medium" ] []
-            , br [] []
             , Input.fullWidth [ placeholder "Full Width" ] []
             ]
         , div []
             [ h2 [] [ text "Textareas" ]
             , Textarea.default [ placeholder "Default" ] []
-            , br [] []
             , Textarea.fullWidth [ placeholder "Full width" ] []
-            , br [] []
             ]
         , div []
             [ h2 [] [ text "Buttons" ]

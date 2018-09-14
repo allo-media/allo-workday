@@ -94,6 +94,7 @@ formStyle =
         , outline none
         , color (hex "354052")
         , fontWeight (int 500)
+        , display block
         , transition
             [ Css.Transitions.border3 100 0 easeInOut
             ]
