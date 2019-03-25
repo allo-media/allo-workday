@@ -61,7 +61,7 @@ init : Session -> ( Model, Cmd Msg )
 init session =
     let
         year =
-            2018
+            2019
 
         month =
             1
@@ -133,8 +133,8 @@ monthSelector : Model -> Html Msg
 monthSelector { year, month } =
     div [ class "month-selector field" ]
         [ div [ class "select" ]
-            [ select [ onInput (\v -> String.toInt v |> Result.withDefault 2018 |> PickYear) ]
-                ([ 2018, 2017 ]
+            [ select [ onInput (\v -> String.toInt v |> Result.withDefault 2019 |> PickYear) ]
+                ([ 2019, 2018, 2017 ]
                     |> List.map
                         (\y ->
                             option [ selected <| y == year ]
@@ -378,9 +378,9 @@ calendar year =
 
         weekOffset =
             if Date.weekday firstDay == Date.Mon then
-                1
+                3
             else
-                0
+                2
 
         yearOffdays =
             Dict.get year offdays |> Maybe.withDefault (Dict.fromList [])
@@ -687,6 +687,21 @@ offdays =
                 , ( timestr 2018 11 1, "Toussaint 2018" )
                 , ( timestr 2018 11 11, "Armistice de 1918 2018" )
                 , ( timestr 2018 12 25, "Noël 2018" )
+                ]
+          )
+        , ( 2019
+          , Dict.fromList
+                [ ( timestr 2019 1 1, "Jour de l’An" )
+                , ( timestr 2019 4 22, "Pâques" )
+                , ( timestr 2019 5 1, "fête du Travail" )
+                , ( timestr 2019 5 8, "Victoire 1945" )
+                , ( timestr 2019 5 30, "Ascension" )
+                , ( timestr 2019 6 10, "Pentecôte" )
+                , ( timestr 2019 7 14, "Fête nationale" )
+                , ( timestr 2019 8 15, "Assomption" )
+                , ( timestr 2019 11 1, "Toussaint" )
+                , ( timestr 2019 11 11, "Armistice 1918" )
+                , ( timestr 2019 12 25, "Noël" )
                 ]
           )
         ]
