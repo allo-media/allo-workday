@@ -407,7 +407,7 @@ calendar year =
     in
         List.range 0 364
             |> List.map createDay
-            |> List.filter (\{ date } -> Date.weekday date /= Date.Sun)
+            |> List.filter (\{ date } -> Date.weekday date /= Date.Sun && Date.weekday date /= Date.Sat)
 
 
 computeTotalPaidVacation : List Day -> Float
