@@ -1,7 +1,7 @@
 module Page.Home exposing (Model, Msg(..), init, update, view)
 
-import Date as CoreDate
 import Data.Session exposing (Session)
+import Date as CoreDate
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -30,6 +30,7 @@ type Kind
     | Rtt
     | SickLeave
     | Worked
+    | NotWorked
     | Other String
 
 
@@ -66,13 +67,13 @@ init session =
         month =
             1
     in
-        { days = calendar year |> refineMonth month
-        , year = year
-        , month = month
-        , today = ""
-        , signature = Drafted ""
-        }
-            ! [ CoreDate.now |> Task.perform DateReceived ]
+    { days = calendar year |> refineMonth month
+    , year = year
+    , month = month
+    , today = ""
+    , signature = Drafted ""
+    }
+        ! [ CoreDate.now |> Task.perform DateReceived ]
 
 
 update : Session -> Msg -> Model -> ( Model, Cmd Msg )
@@ -86,16 +87,16 @@ update session msg ({ days } as model) =
                 month =
                     date |> CoreDate.month |> coreMonthToInt
             in
-                { model
-                    | year = year
-                    , month = month
-                    , days = calendar year |> refineMonth month
-                    , today =
-                        [ CoreDate.day date, month, CoreDate.year date ]
-                            |> List.map toString
-                            |> String.join "/"
-                }
-                    ! []
+            { model
+                | year = year
+                , month = month
+                , days = calendar year |> refineMonth month
+                , today =
+                    [ CoreDate.day date, month, CoreDate.year date ]
+                        |> List.map toString
+                        |> String.join "/"
+            }
+                ! []
 
         LoadSig ->
             { model
@@ -170,48 +171,53 @@ kindSelector daySlice day =
                 Morning ->
                     day.morning
     in
-        div [ class "select" ]
-            [ select
-                [ disabled <| kindToString sliceKind == "jf"
-                , onInput (SetKind daySlice day)
-                ]
-                [ option
-                    [ value "cp"
-                    , selected <| kindToString sliceKind == "cp"
-                    ]
-                    [ text "Congé payé" ]
-                , case sliceKind of
-                    PublicHoliday _ ->
-                        option
-                            [ value "jf"
-                            , selected <| kindToString sliceKind == "jf"
-                            ]
-                            [ text "Jour férié" ]
-
-                    _ ->
-                        text ""
-                , option
-                    [ value "jt"
-                    , selected <| kindToString sliceKind == "jt"
-                    ]
-                    [ text "Jour travaillé" ]
-                , option
-                    [ value "ml"
-                    , selected <| kindToString sliceKind == "ml"
-                    ]
-                    [ text "Maladie" ]
-                , option
-                    [ value "rtt"
-                    , selected <| kindToString sliceKind == "rtt"
-                    ]
-                    [ text "RTT" ]
-                , option
-                    [ value "ot"
-                    , selected <| kindToString sliceKind == "ot"
-                    ]
-                    [ text "Autre" ]
-                ]
+    div [ class "select" ]
+        [ select
+            [ disabled <| kindToString sliceKind == "jf"
+            , onInput (SetKind daySlice day)
             ]
+            [ option
+                [ value "cp"
+                , selected <| kindToString sliceKind == "cp"
+                ]
+                [ text "Congé payé" ]
+            , case sliceKind of
+                PublicHoliday _ ->
+                    option
+                        [ value "jf"
+                        , selected <| kindToString sliceKind == "jf"
+                        ]
+                        [ text "Jour férié" ]
+
+                _ ->
+                    text ""
+            , option
+                [ value "jt"
+                , selected <| kindToString sliceKind == "jt"
+                ]
+                [ text "Jour travaillé" ]
+            , option
+                [ value "ml"
+                , selected <| kindToString sliceKind == "ml"
+                ]
+                [ text "Maladie" ]
+            , option
+                [ value "rtt"
+                , selected <| kindToString sliceKind == "rtt"
+                ]
+                [ text "RTT" ]
+            , option
+                [ value "ot"
+                , selected <| kindToString sliceKind == "ot"
+                ]
+                [ text "Autre" ]
+            , option
+                [ value "nt"
+                , selected <| kindToString sliceKind == "nt"
+                ]
+                [ text "Non travaillé" ]
+            ]
+        ]
 
 
 viewDay : Int -> Day -> Html Msg
@@ -220,35 +226,35 @@ viewDay index ({ date, week, obs } as day) =
         dayOfWeek =
             Date.weekday date
     in
-        tbody []
-            [ case ( Date.day date, dayOfWeek ) of
-                ( 1, _ ) ->
-                    text ""
+    tbody []
+        [ case ( Date.day date, dayOfWeek ) of
+            ( 1, _ ) ->
+                text ""
 
-                ( _, Date.Mon ) ->
-                    tr []
-                        [ td [ colspan 5, class "has-text-centered" ]
-                            [ em [] [ text <| "Semaine " ++ toString week ] ]
-                        ]
-
-                _ ->
-                    text ""
-            , tr []
-                [ td [ class "text-cell" ] [ dayOfWeek |> dayName |> text ]
-                , td [ class "text-cell" ] [ date |> Date.day |> toString |> text ]
-                , td [] [ kindSelector Morning day ]
-                , td [] [ kindSelector Afternoon day ]
-                , td []
-                    [ input
-                        [ class "input"
-                        , type_ "text"
-                        , placeholder "Observations"
-                        , value obs
-                        ]
-                        []
+            ( _, Date.Mon ) ->
+                tr []
+                    [ td [ colspan 5, class "has-text-centered" ]
+                        [ em [] [ text <| "Semaine " ++ toString week ] ]
                     ]
+
+            _ ->
+                text ""
+        , tr []
+            [ td [ class "text-cell" ] [ dayOfWeek |> dayName |> text ]
+            , td [ class "text-cell" ] [ date |> Date.day |> toString |> text ]
+            , td [] [ kindSelector Morning day ]
+            , td [] [ kindSelector Afternoon day ]
+            , td []
+                [ input
+                    [ class "input"
+                    , type_ "text"
+                    , placeholder "Observations"
+                    , value obs
+                    ]
+                    []
                 ]
             ]
+        ]
 
 
 statsView : List Day -> Html Msg
@@ -269,22 +275,22 @@ statsView days =
         totalWorked =
             computeTotalWorkedDays days
     in
-        table []
-            [ thead []
-                [ th [] [ text "Travaillés" ]
-                , th [] [ text "RTT" ]
-                , th [] [ text "Congés payés" ]
-                , th [] [ text "Maladie" ]
-                , th [] [ text "Autre" ]
-                ]
-            , tbody []
-                [ td [] [ text <| toString totalWorked ++ "j" ]
-                , td [] [ text <| toString totalRtt ++ "j" ]
-                , td [] [ text <| toString totalPaidVacation ++ "j" ]
-                , td [] [ text <| toString totalSickLeave ++ "j" ]
-                , td [] [ text <| toString totalOther ++ "j" ]
-                ]
+    table []
+        [ thead []
+            [ th [] [ text "Travaillés" ]
+            , th [] [ text "RTT" ]
+            , th [] [ text "Congés payés" ]
+            , th [] [ text "Maladie" ]
+            , th [] [ text "Autre" ]
             ]
+        , tbody []
+            [ td [] [ text <| toString totalWorked ++ "j" ]
+            , td [] [ text <| toString totalRtt ++ "j" ]
+            , td [] [ text <| toString totalPaidVacation ++ "j" ]
+            , td [] [ text <| toString totalSickLeave ++ "j" ]
+            , td [] [ text <| toString totalOther ++ "j" ]
+            ]
+        ]
 
 
 sigForm : String -> Html Msg
@@ -335,14 +341,13 @@ view session model =
             ]
         , statsView model.days
         , table []
-            ((thead []
+            (thead []
                 [ th [] [ text "Jour" ]
                 , th [] [ text "Date" ]
                 , th [] [ text "Matin" ]
                 , th [] [ text "Après-midi" ]
                 , th [] [ text "Observation" ]
                 ]
-             )
                 :: (model.days |> List.indexedMap viewDay)
             )
         , p [ class "warn" ]
@@ -379,6 +384,7 @@ calendar year =
         weekOffset =
             if Date.weekday firstDay == Date.Mon then
                 3
+
             else
                 2
 
@@ -398,16 +404,24 @@ calendar year =
                         Nothing ->
                             ( "", Worked, Worked )
             in
-                { date = date
-                , week = (d // 7) + weekOffset
-                , obs = obs
-                , morning = morning
-                , afternoon = afternoon
-                }
+            { date = date
+            , week = (d // 7) + weekOffset
+            , obs = obs
+            , morning = morning
+            , afternoon = afternoon
+            }
     in
-        List.range 0 364
-            |> List.map createDay
-            |> List.filter (\{ date } -> Date.weekday date /= Date.Sun)
+    List.range 0 364
+        |> List.map createDay
+        |> List.filter (\{ date } -> Date.weekday date /= Date.Sun)
+        |> List.map
+            (\day ->
+                if Date.weekday day.date == Date.Sat then
+                    { day | morning = NotWorked, afternoon = NotWorked }
+
+                else
+                    day
+            )
 
 
 computeTotalPaidVacation : List Day -> Float
@@ -612,6 +626,9 @@ kindToString kind =
         Worked ->
             "jt"
 
+        NotWorked ->
+            "nt"
+
 
 monthName : Int -> String
 monthName int =
@@ -736,22 +753,26 @@ setKind daySlice kindString day days =
                 "jt" ->
                     Worked
 
+                "nt" ->
+                    NotWorked
+
                 _ ->
                     Debug.crash <| "unsupported kind " ++ kindString
     in
-        days
-            |> List.map
-                (\d ->
-                    if d == day then
-                        case daySlice of
-                            Afternoon ->
-                                { d | afternoon = kind }
+    days
+        |> List.map
+            (\d ->
+                if d == day then
+                    case daySlice of
+                        Afternoon ->
+                            { d | afternoon = kind }
 
-                            Morning ->
-                                { d | morning = kind }
-                    else
-                        d
-                )
+                        Morning ->
+                            { d | morning = kind }
+
+                else
+                    d
+            )
 
 
 timestr : Int -> Int -> Int -> String
