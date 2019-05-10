@@ -3,11 +3,11 @@ module Main exposing (main)
 import Browser exposing (Document)
 import Browser.Navigation as Nav
 import Data.Session as Session exposing (Session)
-import Html.Styled as Html exposing (..)
+import Html exposing (..)
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Page.Counter as Counter
 import Page.Home as Home
+import Page.Settings as Settings
 import Ports
 import Route exposing (Route)
 import Url exposing (Url)
@@ -23,7 +23,7 @@ type alias Flags =
 type Page
     = Blank
     | HomePage Home.Model
-    | CounterPage Counter.Model
+    | SettingsPage Settings.Model
     | NotFound
 
 
@@ -35,7 +35,7 @@ type alias Model =
 
 type Msg
     = HomeMsg Home.Msg
-    | CounterMsg Counter.Msg
+    | SettingsMsg Settings.Msg
     | StoreChanged String
     | UrlChanged Url
     | UrlRequested Browser.UrlRequest
@@ -69,8 +69,8 @@ setRoute maybeRoute model =
         Just Route.Home ->
             toPage HomePage Home.init HomeMsg
 
-        Just Route.Counter ->
-            toPage CounterPage Counter.init CounterMsg
+        Just Route.Settings ->
+            toPage SettingsPage Settings.init SettingsMsg
 
 
 init : Flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -111,8 +111,8 @@ update msg ({ page, session } as model) =
         ( HomeMsg homeMsg, HomePage homeModel ) ->
             toPage HomePage HomeMsg Home.update homeMsg homeModel
 
-        ( CounterMsg counterMsg, CounterPage counterModel ) ->
-            toPage CounterPage CounterMsg Counter.update counterMsg counterModel
+        ( SettingsMsg counterMsg, SettingsPage counterModel ) ->
+            toPage SettingsPage SettingsMsg Settings.update counterMsg counterModel
 
         ( StoreChanged json, _ ) ->
             ( { model | session = { session | store = Session.deserializeStore json } }
@@ -145,7 +145,7 @@ subscriptions model =
             HomePage _ ->
                 Sub.none
 
-            CounterPage _ ->
+            SettingsPage _ ->
                 Sub.none
 
             NotFound ->
@@ -171,10 +171,10 @@ view { page, session } =
                 |> mapMsg HomeMsg
                 |> Page.frame (pageConfig Page.Home)
 
-        CounterPage counterModel ->
-            Counter.view session counterModel
-                |> mapMsg CounterMsg
-                |> Page.frame (pageConfig Page.Counter)
+        SettingsPage counterModel ->
+            Settings.view session counterModel
+                |> mapMsg SettingsMsg
+                |> Page.frame (pageConfig Page.Settings)
 
         NotFound ->
             ( "Not Found", [ Html.text "Not found" ] )

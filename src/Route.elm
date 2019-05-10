@@ -2,22 +2,22 @@ module Route exposing (Route(..), fromUrl, href, pushUrl)
 
 import Browser exposing (Document)
 import Browser.Navigation as Nav
-import Html.Styled exposing (Attribute)
-import Html.Styled.Attributes as Attr
+import Html exposing (Attribute)
+import Html.Attributes as Attr
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser)
 
 
 type Route
     = Home
-    | Counter
+    | Settings
 
 
 parser : Parser (Route -> a) a
 parser =
     Parser.oneOf
         [ Parser.map Home Parser.top
-        , Parser.map Counter (Parser.s "second-page")
+        , Parser.map Settings (Parser.s "settings")
         ]
 
 
@@ -45,7 +45,7 @@ toString route =
                 Home ->
                     []
 
-                Counter ->
-                    [ "second-page" ]
+                Settings ->
+                    [ "settings" ]
     in
     "#/" ++ String.join "/" pieces

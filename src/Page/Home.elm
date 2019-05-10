@@ -3,9 +3,9 @@ module Page.Home exposing (Model, Msg(..), init, update, view)
 import Data.Day as Day exposing (Day)
 import Data.Session exposing (Session)
 import Dict exposing (Dict)
-import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (..)
-import Html.Styled.Events exposing (..)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 import Task
 import Time exposing (Posix)
 import Time.Date as Date exposing (Date)
@@ -50,7 +50,12 @@ init session =
       , year = year
       , month = month
       , today = ""
-      , signature = Drafted ""
+      , signature =
+            if session.store.signature == "" then
+                Drafted ""
+
+            else
+                Loaded session.store.signature
       }
     , session
     , Time.now |> Task.perform DateReceived
@@ -298,7 +303,7 @@ statsView days =
 
 sigForm : String -> Html Msg
 sigForm sigUrl =
-    Html.Styled.form
+    Html.form
         [ class "field is-horizontal sig-field"
         , onSubmit LoadSig
         ]
@@ -338,7 +343,14 @@ view session model =
             , div [ class "field-body" ]
                 [ div [ class "field" ]
                     [ p [ class "control is-expanded" ]
-                        [ input [ type_ "text", class "input name", placeholder "Jean Dupuis" ] [] ]
+                        [ input
+                            [ type_ "text"
+                            , class "input name"
+                            , placeholder "Jean Dupuis"
+                            , value session.store.name
+                            ]
+                            []
+                        ]
                     ]
                 ]
             ]
