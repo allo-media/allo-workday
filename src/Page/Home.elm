@@ -6,6 +6,7 @@ import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Route
 import Task
 import Time exposing (Posix)
 import Time.Date as Date exposing (Date)
@@ -32,9 +33,7 @@ type Msg
     | LoadSig
     | PickMonth Int
     | PickYear Int
-    | ResetSig
-    | SetKind Day.Slice Day String
-    | UpdateSig String
+    | SetKind Day.Slice Day Day.Kind
 
 
 init : Session -> ( Model, Session, Cmd Msg )
@@ -115,20 +114,8 @@ update session msg ({ days } as model) =
             , Cmd.none
             )
 
-        ResetSig ->
-            ( { model | signature = Drafted "" }
-            , session
-            , Cmd.none
-            )
-
-        SetKind daySlice day kindString ->
-            ( { model | days = days |> Day.setKind daySlice kindString day }
-            , session
-            , Cmd.none
-            )
-
-        UpdateSig sigUrl ->
-            ( { model | signature = Drafted sigUrl }
+        SetKind daySlice day kind ->
+            ( { model | days = days |> Day.setKind daySlice kind day }
             , session
             , Cmd.none
             )
@@ -180,51 +167,10 @@ kindSelector daySlice day =
                     day.morning
     in
     div [ class "select" ]
-        [ select
-            [ disabled <| Day.kindToString sliceKind == "jf"
-            , onInput (SetKind daySlice day)
-            ]
-            [ option
-                [ value "cp"
-                , selected <| Day.kindToString sliceKind == "cp"
-                ]
-                [ text "Congé payé" ]
-            , case sliceKind of
-                Day.PublicHoliday _ ->
-                    option
-                        [ value "jf"
-                        , selected <| Day.kindToString sliceKind == "jf"
-                        ]
-                        [ text "Jour férié" ]
-
-                _ ->
-                    text ""
-            , option
-                [ value "jt"
-                , selected <| Day.kindToString sliceKind == "jt"
-                ]
-                [ text "Jour travaillé" ]
-            , option
-                [ value "ml"
-                , selected <| Day.kindToString sliceKind == "ml"
-                ]
-                [ text "Maladie" ]
-            , option
-                [ value "rtt"
-                , selected <| Day.kindToString sliceKind == "rtt"
-                ]
-                [ text "RTT" ]
-            , option
-                [ value "ot"
-                , selected <| Day.kindToString sliceKind == "ot"
-                ]
-                [ text "Autre" ]
-            , option
-                [ value "nt"
-                , selected <| Day.kindToString sliceKind == "nt"
-                ]
-                [ text "Non travaillé" ]
-            ]
+        [ [ Day.Worked, Day.PaidVacation, Day.PublicHoliday "", Day.Rtt, Day.SickLeave, Day.NotWorked, Day.Other "" ]
+            |> List.map Day.kindToString
+            |> List.map (\v -> option [ selected (v == Day.kindToString sliceKind) ] [ text v ])
+            |> select [ onInput (Day.kindFromString >> SetKind daySlice day) ]
         ]
 
 
@@ -301,34 +247,6 @@ statsView days =
         ]
 
 
-sigForm : String -> Html Msg
-sigForm sigUrl =
-    Html.form
-        [ class "field is-horizontal sig-field"
-        , onSubmit LoadSig
-        ]
-        [ div [ class "field-label is-normal" ]
-            [ label [ class "label" ] [ text "Signature URL" ] ]
-        , div [ class "field-body" ]
-            [ div [ class "field has-addons" ]
-                [ div [ class "control" ]
-                    [ input
-                        [ type_ "text"
-                        , class "input sig"
-                        , placeholder "http://"
-                        , onInput UpdateSig
-                        , required True
-                        ]
-                        []
-                    ]
-                , div [ class "control" ]
-                    [ button [ type_ "submit", class "button" ] [ text "Load" ]
-                    ]
-                ]
-            ]
-        ]
-
-
 view : Session -> Model -> ( String, List (Html Msg) )
 view session model =
     ( "Feuille de temps"
@@ -337,22 +255,13 @@ view session model =
             [ text "Relevé de jours travaillés, "
             , text <| Day.monthName model.month ++ " " ++ String.fromInt model.year
             ]
-      , div [ class "field is-horizontal name-field" ]
-            [ div [ class "field-label is-normal" ]
-                [ label [ class "label" ] [ text "Salarié" ] ]
-            , div [ class "field-body" ]
-                [ div [ class "field" ]
-                    [ p [ class "control is-expanded" ]
-                        [ input
-                            [ type_ "text"
-                            , class "input name"
-                            , placeholder "Jean Dupuis"
-                            , value session.store.name
-                            ]
-                            []
-                        ]
-                    ]
-                ]
+      , p []
+            [ strong [] [ text "Salarié : " ]
+            , if session.store.name == "" then
+                a [ Route.href Route.Settings ] [ text "Set your employee name" ]
+
+              else
+                strong [] [ text session.store.name ]
             ]
       , statsView model.days
       , table []
@@ -375,13 +284,11 @@ view session model =
             [ text <| "Le " ++ model.today ++ ", signature du salarié" ]
       , case model.signature of
             Drafted sigUrl ->
-                sigForm sigUrl
+                a [ Route.href Route.Settings ] [ text "Define a signature" ]
 
             Loaded sigUrl ->
                 p [ class "has-text-right" ]
                     [ img [ class "sigImg", src sigUrl ] []
-                    , br [] []
-                    , button [ class "button", onClick ResetSig ] [ text "reset" ]
                     ]
       ]
     )

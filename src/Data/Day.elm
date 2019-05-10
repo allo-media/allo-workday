@@ -239,22 +239,22 @@ dayName day =
 kindFromString : String -> Kind
 kindFromString kindString =
     case kindString of
-        "cp" ->
+        "Congé payé" ->
             PaidVacation
 
-        "jf" ->
+        "Jour férié" ->
             PublicHoliday ""
 
-        "rtt" ->
+        "RTT" ->
             Rtt
 
-        "ml" ->
+        "Maladie" ->
             SickLeave
 
-        "jt" ->
+        "Jour travaillé" ->
             Worked
 
-        "nt" ->
+        "Non travaillé" ->
             NotWorked
 
         _ ->
@@ -265,25 +265,25 @@ kindToString : Kind -> String
 kindToString kind =
     case kind of
         Other _ ->
-            "ot"
+            "Autre"
 
         PaidVacation ->
-            "cp"
+            "Congé payé"
 
         PublicHoliday _ ->
-            "jf"
+            "Jour férié"
 
         Rtt ->
-            "rtt"
+            "RTT"
 
         SickLeave ->
-            "ml"
+            "Maladie"
 
         Worked ->
-            "jt"
+            "Jour travaillé"
 
         NotWorked ->
-            "nt"
+            "Non travaillé"
 
 
 monthName : Int -> String
@@ -379,27 +379,25 @@ offDays =
 
 
 refineMonth : Int -> List Day -> List Day
-refineMonth month days =
-    days
-        |> List.filter (\({ date } as wd) -> Date.month date == month)
+refineMonth month =
+    List.filter (\{ date } -> Date.month date == month)
 
 
-setKind : Slice -> String -> Day -> List Day -> List Day
-setKind daySlice kindString day days =
-    days
-        |> List.map
-            (\d ->
-                if d == day then
-                    case daySlice of
-                        Afternoon ->
-                            { d | afternoon = kindFromString kindString }
+setKind : Slice -> Kind -> Day -> List Day -> List Day
+setKind daySlice kind day =
+    List.map
+        (\d ->
+            if d == day then
+                case daySlice of
+                    Afternoon ->
+                        { d | afternoon = kind }
 
-                        Morning ->
-                            { d | morning = kindFromString kindString }
+                    Morning ->
+                        { d | morning = kind }
 
-                else
-                    d
-            )
+            else
+                d
+        )
 
 
 timestr : Int -> Int -> Int -> String
