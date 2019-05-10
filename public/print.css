@@ -1,0 +1,91 @@
+@page {
+  size: auto;
+  margin: 5mm 5mm 5mm 5mm;
+}
+
+body {
+  font-family: Ubuntu;
+  font-size: 14px;
+  margin: 0 1em;
+  padding: 0;
+}
+
+.header {
+  display: none;
+}
+
+.month-selector {
+  display: none;
+}
+
+h1 {
+  margin: 0 0 .2em 0;
+  padding: 0;
+}
+
+table {
+  border: 1px solid #999;
+  width: 100%;
+  max-width: 1024px;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-bottom: 1em;
+}
+
+td {
+  border: 1px solid #999;
+  padding: 3px;
+  font-size: 1em;
+}
+
+button {
+  display: none;
+}
+
+input, select {
+  border: none;
+  font-family: Ubuntu;
+  font-size: 1em;
+}
+
+.name {
+  font-weight: bold;
+}
+
+.name-field .field-label {
+  float: left;
+  width: 70px;
+}
+.name-field .field-body {
+  float: left;
+  margin-top: -17px;
+}
+
+.sig-field label {
+  display: none;
+}
+
+.has-text-right {
+  text-align: right;
+}
+
+.warn {
+  font-size: 10px;
+}
+
+.sigImg {
+  max-width: 200px;
+}
+
+::-webkit-input-placeholder {
+  color: transparent;
+}
+:-moz-placeholder {
+  color: transparent;
+}
+::-moz-placeholder {
+  color: transparent;
+}
+:-ms-input-placeholder {
+  color: transparent;
+}
