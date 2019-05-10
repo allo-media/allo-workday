@@ -1,5 +1,6 @@
 module Page.Home exposing (Model, Msg(..), init, update, view)
 
+import Data.Day as Day exposing (Day)
 import Data.Session exposing (Session)
 import Dict exposing (Dict)
 import Html.Styled exposing (..)
@@ -10,30 +11,6 @@ import Time exposing (Posix)
 import Time.Date as Date exposing (Date)
 import Time.DateTime as DateTime
 import Time.Iso8601 as Iso8601
-
-
-type alias Day =
-    { date : Date
-    , week : Int
-    , obs : String
-    , afternoon : Kind
-    , morning : Kind
-    }
-
-
-type DaySlice
-    = Afternoon
-    | Morning
-
-
-type Kind
-    = PaidVacation
-    | PublicHoliday String
-    | Rtt
-    | SickLeave
-    | Worked
-    | NotWorked
-    | Other String
 
 
 type Signature
@@ -56,7 +33,7 @@ type Msg
     | PickMonth Int
     | PickYear Int
     | ResetSig
-    | SetKind DaySlice Day String
+    | SetKind Day.Slice Day String
     | UpdateSig String
 
 
@@ -69,7 +46,7 @@ init session =
         month =
             1
     in
-    ( { days = calendar year |> refineMonth month
+    ( { days = Day.calendar year |> Day.refineMonth month
       , year = year
       , month = month
       , today = ""
@@ -97,7 +74,7 @@ update session msg ({ days } as model) =
             ( { model
                 | year = year
                 , month = month
-                , days = calendar year |> refineMonth month
+                , days = Day.calendar year |> Day.refineMonth month
                 , today =
                     [ Date.day date, month, Date.year date ]
                         |> List.map String.fromInt
@@ -122,13 +99,13 @@ update session msg ({ days } as model) =
             )
 
         PickMonth month ->
-            ( { model | month = month, days = calendar model.year |> refineMonth month }
+            ( { model | month = month, days = Day.calendar model.year |> Day.refineMonth month }
             , session
             , Cmd.none
             )
 
         PickYear year ->
-            ( { model | year = year, month = 1, days = calendar year |> refineMonth 1 }
+            ( { model | year = year, month = 1, days = Day.calendar year |> Day.refineMonth 1 }
             , session
             , Cmd.none
             )
@@ -140,7 +117,7 @@ update session msg ({ days } as model) =
             )
 
         SetKind daySlice day kindString ->
-            ( { model | days = days |> setKind daySlice kindString day }
+            ( { model | days = days |> Day.setKind daySlice kindString day }
             , session
             , Cmd.none
             )
@@ -179,39 +156,39 @@ monthSelector { year, month } =
                                 [ value <| String.fromInt m
                                 , selected <| m == month
                                 ]
-                                [ m |> monthName |> text ]
+                                [ m |> Day.monthName |> text ]
                         )
                 )
             ]
         ]
 
 
-kindSelector : DaySlice -> Day -> Html Msg
+kindSelector : Day.Slice -> Day -> Html Msg
 kindSelector daySlice day =
     let
         sliceKind =
             case daySlice of
-                Afternoon ->
+                Day.Afternoon ->
                     day.afternoon
 
-                Morning ->
+                Day.Morning ->
                     day.morning
     in
     div [ class "select" ]
         [ select
-            [ disabled <| kindToString sliceKind == "jf"
+            [ disabled <| Day.kindToString sliceKind == "jf"
             , onInput (SetKind daySlice day)
             ]
             [ option
                 [ value "cp"
-                , selected <| kindToString sliceKind == "cp"
+                , selected <| Day.kindToString sliceKind == "cp"
                 ]
                 [ text "Congé payé" ]
             , case sliceKind of
-                PublicHoliday _ ->
+                Day.PublicHoliday _ ->
                     option
                         [ value "jf"
-                        , selected <| kindToString sliceKind == "jf"
+                        , selected <| Day.kindToString sliceKind == "jf"
                         ]
                         [ text "Jour férié" ]
 
@@ -219,27 +196,27 @@ kindSelector daySlice day =
                     text ""
             , option
                 [ value "jt"
-                , selected <| kindToString sliceKind == "jt"
+                , selected <| Day.kindToString sliceKind == "jt"
                 ]
                 [ text "Jour travaillé" ]
             , option
                 [ value "ml"
-                , selected <| kindToString sliceKind == "ml"
+                , selected <| Day.kindToString sliceKind == "ml"
                 ]
                 [ text "Maladie" ]
             , option
                 [ value "rtt"
-                , selected <| kindToString sliceKind == "rtt"
+                , selected <| Day.kindToString sliceKind == "rtt"
                 ]
                 [ text "RTT" ]
             , option
                 [ value "ot"
-                , selected <| kindToString sliceKind == "ot"
+                , selected <| Day.kindToString sliceKind == "ot"
                 ]
                 [ text "Autre" ]
             , option
                 [ value "nt"
-                , selected <| kindToString sliceKind == "nt"
+                , selected <| Day.kindToString sliceKind == "nt"
                 ]
                 [ text "Non travaillé" ]
             ]
@@ -266,10 +243,10 @@ viewDay index ({ date, week, obs } as day) =
             _ ->
                 text ""
         , tr []
-            [ td [ class "text-cell" ] [ dayOfWeek |> dayName |> text ]
+            [ td [ class "text-cell" ] [ dayOfWeek |> Day.dayName |> text ]
             , td [ class "text-cell" ] [ date |> Date.day |> String.fromInt |> text ]
-            , td [] [ kindSelector Morning day ]
-            , td [] [ kindSelector Afternoon day ]
+            , td [] [ kindSelector Day.Morning day ]
+            , td [] [ kindSelector Day.Afternoon day ]
             , td []
                 [ input
                     [ class "input"
@@ -287,19 +264,19 @@ statsView : List Day -> Html Msg
 statsView days =
     let
         totalOther =
-            computeOther days
+            Day.computeOther days
 
         totalPaidVacation =
-            computeTotalPaidVacation days
+            Day.computeTotalPaidVacation days
 
         totalRtt =
-            computeTotalRtt days
+            Day.computeTotalRtt days
 
         totalSickLeave =
-            computeTotalSickLeave days
+            Day.computeTotalSickLeave days
 
         totalWorked =
-            computeTotalWorkedDays days
+            Day.computeTotalWorkedDays days
     in
     table []
         [ thead []
@@ -353,7 +330,7 @@ view session model =
     , [ monthSelector model
       , h1 []
             [ text "Relevé de jours travaillés, "
-            , text <| monthName model.month ++ " " ++ String.fromInt model.year
+            , text <| Day.monthName model.month ++ " " ++ String.fromInt model.year
             ]
       , div [ class "field is-horizontal name-field" ]
             [ div [ class "field-label is-normal" ]
@@ -396,367 +373,3 @@ view session model =
                     ]
       ]
     )
-
-
-
--- Utils
-
-
-calendar : Int -> List Day
-calendar year =
-    let
-        firstDay =
-            Date.date year 1 1
-
-        weekOffset =
-            if Date.weekday firstDay == Date.Mon then
-                3
-
-            else
-                2
-
-        yearOffdays =
-            Dict.get year offdays |> Maybe.withDefault (Dict.fromList [])
-
-        createDay d =
-            let
-                date =
-                    firstDay |> Date.addDays d
-
-                ( obs, morning, afternoon ) =
-                    case Dict.get (Iso8601.fromDate date) yearOffdays of
-                        Just offdayName ->
-                            ( offdayName, PublicHoliday offdayName, PublicHoliday offdayName )
-
-                        Nothing ->
-                            ( "", Worked, Worked )
-            in
-            { date = date
-            , week = (d // 7) + weekOffset
-            , obs = obs
-            , morning = morning
-            , afternoon = afternoon
-            }
-    in
-    List.range 0 364
-        |> List.map createDay
-        |> List.filter (\{ date } -> Date.weekday date /= Date.Sun)
-        |> List.map
-            (\day ->
-                if Date.weekday day.date == Date.Sat then
-                    { day | morning = NotWorked, afternoon = NotWorked }
-
-                else
-                    day
-            )
-
-
-computeTotalPaidVacation : List Day -> Float
-computeTotalPaidVacation days =
-    (days
-        |> List.map
-            (\{ morning, afternoon } ->
-                case ( morning, afternoon ) of
-                    ( PaidVacation, PaidVacation ) ->
-                        2
-
-                    ( _, PaidVacation ) ->
-                        1
-
-                    ( PaidVacation, _ ) ->
-                        1
-
-                    _ ->
-                        0
-            )
-        |> List.sum
-    )
-        / 2
-
-
-computeOther : List Day -> Float
-computeOther days =
-    (days
-        |> List.map
-            (\{ morning, afternoon } ->
-                case ( morning, afternoon ) of
-                    ( Other _, Other _ ) ->
-                        2
-
-                    ( _, Other _ ) ->
-                        1
-
-                    ( Other _, _ ) ->
-                        1
-
-                    _ ->
-                        0
-            )
-        |> List.sum
-    )
-        / 2
-
-
-computeTotalRtt : List Day -> Float
-computeTotalRtt days =
-    (days
-        |> List.map
-            (\{ morning, afternoon } ->
-                case ( morning, afternoon ) of
-                    ( Rtt, Rtt ) ->
-                        2
-
-                    ( _, Rtt ) ->
-                        1
-
-                    ( Rtt, _ ) ->
-                        1
-
-                    _ ->
-                        0
-            )
-        |> List.sum
-    )
-        / 2
-
-
-computeTotalSickLeave : List Day -> Float
-computeTotalSickLeave days =
-    (days
-        |> List.map
-            (\{ morning, afternoon } ->
-                case ( morning, afternoon ) of
-                    ( SickLeave, SickLeave ) ->
-                        2
-
-                    ( _, SickLeave ) ->
-                        1
-
-                    ( SickLeave, _ ) ->
-                        1
-
-                    _ ->
-                        0
-            )
-        |> List.sum
-    )
-        / 2
-
-
-computeTotalWorkedDays : List Day -> Float
-computeTotalWorkedDays days =
-    (days
-        |> List.map
-            (\{ morning, afternoon } ->
-                case ( morning, afternoon ) of
-                    ( Worked, Worked ) ->
-                        2
-
-                    ( _, Worked ) ->
-                        1
-
-                    ( Worked, _ ) ->
-                        1
-
-                    _ ->
-                        0
-            )
-        |> List.sum
-        |> toFloat
-    )
-        / 2
-
-
-dayName : Date.Weekday -> String
-dayName day =
-    case day of
-        Date.Mon ->
-            "Lun"
-
-        Date.Tue ->
-            "Mar"
-
-        Date.Wed ->
-            "Mer"
-
-        Date.Thu ->
-            "Jeu"
-
-        Date.Fri ->
-            "Ven"
-
-        Date.Sat ->
-            "Sam"
-
-        Date.Sun ->
-            "Dim"
-
-
-kindToString : Kind -> String
-kindToString kind =
-    case kind of
-        Other _ ->
-            "ot"
-
-        PaidVacation ->
-            "cp"
-
-        PublicHoliday _ ->
-            "jf"
-
-        Rtt ->
-            "rtt"
-
-        SickLeave ->
-            "ml"
-
-        Worked ->
-            "jt"
-
-        NotWorked ->
-            "nt"
-
-
-monthName : Int -> String
-monthName int =
-    case int of
-        1 ->
-            "Janvier"
-
-        2 ->
-            "Février"
-
-        3 ->
-            "Mars"
-
-        4 ->
-            "Avril"
-
-        5 ->
-            "Mai"
-
-        6 ->
-            "Juin"
-
-        7 ->
-            "Juillet"
-
-        8 ->
-            "Août"
-
-        9 ->
-            "Septembre"
-
-        10 ->
-            "Octobre"
-
-        11 ->
-            "Novembre"
-
-        _ ->
-            -- FIXME: this is bad.
-            "Décembre"
-
-
-offdays : Dict Int (Dict String String)
-offdays =
-    Dict.fromList
-        [ ( 2017
-          , Dict.fromList
-                [ ( timestr 2017 1 1, "Premier de l'An 2017" )
-                , ( timestr 2017 4 17, "Lundi de Pâques 2017" )
-                , ( timestr 2017 5 1, "Fête du travail 2017" )
-                , ( timestr 2017 5 8, "Victoire 1945 2017" )
-                , ( timestr 2017 5 25, "Ascension 2017" )
-                , ( timestr 2017 6 5, "Lundi de Pentecôte 2017" )
-                , ( timestr 2017 7 14, "Fête Nationale 2017" )
-                , ( timestr 2017 8 15, "Assomption 2017" )
-                , ( timestr 2017 11 1, "Toussaint 2017" )
-                , ( timestr 2017 11 11, "Armistice de 1918 2017" )
-                , ( timestr 2017 12 25, "Noël 2017" )
-                ]
-          )
-        , ( 2018
-          , Dict.fromList
-                [ ( timestr 2018 1 1, "Premier de l'An 2018" )
-                , ( timestr 2018 4 2, "Lundi de Pâques 2018" )
-                , ( timestr 2018 5 1, "Fête du travail 2018" )
-                , ( timestr 2018 5 8, "Victoire 1945 2018" )
-                , ( timestr 2018 5 10, "Ascension 2018" )
-                , ( timestr 2018 5 21, "Lundi de Pentecôte 2018" )
-                , ( timestr 2018 7 14, "Fête Nationale 2018" )
-                , ( timestr 2018 8 15, "Assomption 2018" )
-                , ( timestr 2018 11 1, "Toussaint 2018" )
-                , ( timestr 2018 11 11, "Armistice de 1918 2018" )
-                , ( timestr 2018 12 25, "Noël 2018" )
-                ]
-          )
-        , ( 2019
-          , Dict.fromList
-                [ ( timestr 2019 1 1, "Jour de l’An" )
-                , ( timestr 2019 4 22, "Pâques" )
-                , ( timestr 2019 5 1, "fête du Travail" )
-                , ( timestr 2019 5 8, "Victoire 1945" )
-                , ( timestr 2019 5 30, "Ascension" )
-                , ( timestr 2019 6 10, "Pentecôte" )
-                , ( timestr 2019 7 14, "Fête nationale" )
-                , ( timestr 2019 8 15, "Assomption" )
-                , ( timestr 2019 11 1, "Toussaint" )
-                , ( timestr 2019 11 11, "Armistice 1918" )
-                , ( timestr 2019 12 25, "Noël" )
-                ]
-          )
-        ]
-
-
-refineMonth : Int -> List Day -> List Day
-refineMonth month days =
-    days
-        |> List.filter (\({ date } as wd) -> Date.month date == month)
-
-
-setKind : DaySlice -> String -> Day -> List Day -> List Day
-setKind daySlice kindString day days =
-    let
-        kind =
-            case kindString of
-                "cp" ->
-                    PaidVacation
-
-                "jf" ->
-                    PublicHoliday ""
-
-                "rtt" ->
-                    Rtt
-
-                "ml" ->
-                    SickLeave
-
-                "jt" ->
-                    Worked
-
-                "nt" ->
-                    NotWorked
-
-                _ ->
-                    Other ""
-    in
-    days
-        |> List.map
-            (\d ->
-                if d == day then
-                    case daySlice of
-                        Afternoon ->
-                            { d | afternoon = kind }
-
-                        Morning ->
-                            { d | morning = kind }
-
-                else
-                    d
-            )
-
-
-timestr : Int -> Int -> Int -> String
-timestr year month day =
-    Date.date year month day |> Iso8601.fromDate
