@@ -6,6 +6,7 @@ import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Ports
 import Route
 import Task
 import Time exposing (Posix)
@@ -33,6 +34,7 @@ type Msg
     | LoadSig
     | PickMonth Int
     | PickYear Int
+    | Print
     | SetKind Day.Slice Day Day.Kind
 
 
@@ -114,6 +116,12 @@ update session msg ({ days } as model) =
             , Cmd.none
             )
 
+        Print ->
+            ( model
+            , session
+            , Ports.print ()
+            )
+
         SetKind daySlice day kind ->
             ( { model | days = days |> Day.setKind daySlice kind day }
             , session
@@ -127,33 +135,39 @@ update session msg ({ days } as model) =
 
 monthSelector : Model -> Html Msg
 monthSelector { year, month } =
-    div [ class "month-selector field" ]
-        [ div [ class "select" ]
-            [ select [ onInput (\v -> String.toInt v |> Maybe.withDefault 2019 |> PickYear) ]
-                (Day.offDays
-                    |> Dict.toList
-                    |> List.map Tuple.first
-                    |> List.map
-                        (\y ->
-                            option [ selected <| y == year ]
-                                [ y |> String.fromInt |> text ]
-                        )
-                )
+    div [ class "columns app-actions" ]
+        [ div [ class "column" ]
+            [ div [ class "select" ]
+                [ select [ onInput (\v -> String.toInt v |> Maybe.withDefault 2019 |> PickYear) ]
+                    (Day.offDays
+                        |> Dict.toList
+                        |> List.map Tuple.first
+                        |> List.map
+                            (\y ->
+                                option [ selected <| y == year ]
+                                    [ y |> String.fromInt |> text ]
+                            )
+                    )
+                ]
+            , text " "
+            , div
+                [ class "select" ]
+                [ select [ onInput (\v -> String.toInt v |> Maybe.withDefault 1 |> PickMonth) ]
+                    (List.range 1 12
+                        |> List.map
+                            (\m ->
+                                option
+                                    [ value <| String.fromInt m
+                                    , selected <| m == month
+                                    ]
+                                    [ m |> Day.monthName |> text ]
+                            )
+                    )
+                ]
             ]
-        , text " "
-        , div
-            [ class "select" ]
-            [ select [ onInput (\v -> String.toInt v |> Maybe.withDefault 1 |> PickMonth) ]
-                (List.range 1 12
-                    |> List.map
-                        (\m ->
-                            option
-                                [ value <| String.fromInt m
-                                , selected <| m == month
-                                ]
-                                [ m |> Day.monthName |> text ]
-                        )
-                )
+        , div [ class "column has-text-right" ]
+            [ button [ class "button is-primary", onClick Print ]
+                [ text "Lancer l'impression" ]
             ]
         ]
 
@@ -254,7 +268,7 @@ view : Session -> Model -> ( String, List (Html Msg) )
 view session model =
     ( "Feuille de temps"
     , [ monthSelector model
-      , h1 []
+      , h1 [ class "app-home-title" ]
             [ text "Relevé de jours travaillés, "
             , text <| Day.monthName model.month ++ " " ++ String.fromInt model.year
             ]

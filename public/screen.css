@@ -18,6 +18,18 @@ body {
   margin-bottom: 0;
 }
 
+.app-actions:not(:last-child) {
+  margin-bottom: 0;
+}
+
+.app-actions .field:not(:last-child) {
+  margin-bottom: 0;
+}
+
+.content h1:not(:first-child).app-home-title {
+  margin-top: .25em;
+}
+
 .instructions {
   padding-top: .7em;
 }

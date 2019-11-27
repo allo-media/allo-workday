@@ -44,8 +44,8 @@ viewHeader { activePage } =
         [ nav [ class "tabs is-medium app-menu" ]
             [ ul []
                 [ h1 [ class "app-title" ] [ text "Workday" ]
-                , linkIf Home Route.Home "Home"
-                , linkIf Settings Route.Settings "Settings"
+                , linkIf Home Route.Home "Accueil"
+                , linkIf Settings Route.Settings "Paramètres"
                 ]
             ]
         , p [ class "instructions" ]
