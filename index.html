@@ -26,6 +26,10 @@
       localStorage[storeKey] = rawStore;
     });
 
+    app.ports.print.subscribe(() => {
+      window.print();
+    });
+
     // Ensure session is refreshed when it changes in another tab/window
     window.addEventListener("storage", (event) => {
       if (event.storageArea === localStorage && event.key === storeKey) {
