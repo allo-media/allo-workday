@@ -4,6 +4,8 @@
 
 Ce projet permet de remplir les déclarations légales de temps travaillé [au forfait jour](https://www.service-public.fr/particuliers/vosdroits/F19261).
 
+![Screenshot](https://i.imgur.com/V2Vu6ZC.jpg)
+
 Il est écrit en [Elm](https://elm-lang.org/) et utilise [elm-kitchen](https://github.com/allo-media/elm-kitchen) pour l'architecture technique et la structuration des fichiers.
 
 ## Installation
