@@ -9,6 +9,25 @@ body {
   z-index: 2000;
 }
 
+.app-title {
+  font-weight: bold;
+  margin-right: 1em;
+}
+
+.app-menu.tabs {
+  margin-bottom: 0;
+}
+
+.instructions {
+  padding-top: .7em;
+}
+
+.form-help {
+  font-size: .8em;
+  font-style: italic;
+  padding: .2em 0 0 .8em;
+}
+
 .content {
   padding-top: 1rem;
 }
