@@ -50,7 +50,7 @@ viewHeader { activePage } =
             ]
         , p [ class "instructions" ]
             [ strong [] [ text "Instructions: " ]
-            , text "Sélctionnez le mois, remplissez le formulaire, puis lancez l'impression de la page ("
+            , text "Sélectionnez le mois, remplissez le formulaire, puis lancez l'impression de la page ("
             , code [] [ text "Ctrl + P" ]
             , text ") et exportez là en PDF."
             ]
