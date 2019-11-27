@@ -138,6 +138,7 @@ monthSelector { year, month } =
                         )
                 )
             ]
+        , text " "
         , div
             [ class "select" ]
             [ select [ onInput (\v -> String.toInt v |> Maybe.withDefault 1 |> PickMonth) ]

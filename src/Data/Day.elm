@@ -375,6 +375,36 @@ offDays =
                 , ( timestr 2019 12 25, "Noël" )
                 ]
           )
+        , ( 2020
+          , Dict.fromList
+                [ ( timestr 2020 1 1, "Jour de l’An" )
+                , ( timestr 2020 4 13, "Pâques" )
+                , ( timestr 2020 5 1, "Fête du Travail" )
+                , ( timestr 2020 5 8, "Victoire des Alliés en 1945" )
+                , ( timestr 2020 5 21, "Ascension" )
+                , ( timestr 2020 6 1, "Pentecôte" )
+                , ( timestr 2020 7 14, "Fête nationale" )
+                , ( timestr 2020 8 15, "Assomption" )
+                , ( timestr 2020 11 1, "Toussaint" )
+                , ( timestr 2020 11 11, "Armistice 1918" )
+                , ( timestr 2020 12 25, "Noël" )
+                ]
+          )
+        , ( 2021
+          , Dict.fromList
+                [ ( timestr 2021 1 1, "Jour de l’An" )
+                , ( timestr 2021 4 5, "Pâques" )
+                , ( timestr 2021 5 1, "Fête du Travail" )
+                , ( timestr 2021 5 8, "Victoire des Alliés en 1945" )
+                , ( timestr 2021 5 13, "Ascension" )
+                , ( timestr 2021 5 24, "Pentecôte" )
+                , ( timestr 2021 7 14, "Fête nationale" )
+                , ( timestr 2021 8 15, "Assomption" )
+                , ( timestr 2021 11 1, "Toussaint" )
+                , ( timestr 2021 11 11, "Armistice 1918" )
+                , ( timestr 2021 12 25, "Noël" )
+                ]
+          )
         ]
 
 
