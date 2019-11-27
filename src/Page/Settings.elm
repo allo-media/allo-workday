@@ -60,8 +60,13 @@ view _ { name, signature } =
                 , div [ class "control" ]
                     [ input [ type_ "url", class "input", onInput UpdateSignature, value signature ] []
                     ]
+                , p [ class "form-help" ]
+                    [ text "Vous pouvez télécharger votre signature sur un service d'hébergement gratuit comme "
+                    , a [ href "https://imgur.com/" ] [ text "Igmur" ]
+                    , text "."
+                    ]
                 ]
-            , div [ class "field" ] [ button [] [ text "Save" ] ]
+            , div [ class "field" ] [ button [ class "button is-primary" ] [ text "Save" ] ]
             ]
       ]
     )

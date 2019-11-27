@@ -130,7 +130,9 @@ monthSelector { year, month } =
     div [ class "month-selector field" ]
         [ div [ class "select" ]
             [ select [ onInput (\v -> String.toInt v |> Maybe.withDefault 2019 |> PickYear) ]
-                ([ 2019, 2018, 2017 ]
+                (Day.offDays
+                    |> Dict.toList
+                    |> List.map Tuple.first
                     |> List.map
                         (\y ->
                             option [ selected <| y == year ]

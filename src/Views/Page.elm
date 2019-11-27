@@ -41,10 +41,17 @@ viewHeader { activePage } =
                 li [] [ a [ Route.href route ] [ text caption ] ]
     in
     div [ class "header" ]
-        [ div [ class "tabs is-medium" ]
+        [ nav [ class "tabs is-medium app-menu" ]
             [ ul []
-                [ linkIf Home Route.Home "Home"
+                [ h1 [ class "app-title" ] [ text "Workday" ]
+                , linkIf Home Route.Home "Home"
                 , linkIf Settings Route.Settings "Settings"
                 ]
+            ]
+        , p [ class "instructions" ]
+            [ strong [] [ text "Instructions: " ]
+            , text "Sélctionnez le mois, remplissez le formulaire, puis lancez l'impression de la page ("
+            , code [] [ text "Ctrl + P" ]
+            , text ") et exportez là en PDF."
             ]
         ]
