@@ -405,6 +405,51 @@ offDays =
                 , ( timestr 2021 12 25, "Noël" )
                 ]
           )
+        , ( 2022
+          , Dict.fromList
+                [ ( timestr 2022 1 1, "Jour de l’An" )
+                , ( timestr 2022 4 18, "Pâques" )
+                , ( timestr 2022 5 1, "Fête du Travail" )
+                , ( timestr 2022 5 8, "Victoire des Alliés en 1945" )
+                , ( timestr 2022 5 26, "Ascension" )
+                , ( timestr 2022 6 6, "Pentecôte" )
+                , ( timestr 2022 7 14, "Fête nationale" )
+                , ( timestr 2022 8 15, "Assomption" )
+                , ( timestr 2022 11 1, "Toussaint" )
+                , ( timestr 2022 11 11, "Armistice 1918" )
+                , ( timestr 2022 12 25, "Noël" )
+                ]
+          )
+        , ( 2023
+          , Dict.fromList
+                [ ( timestr 2023 1 1, "Jour de l’An" )
+                , ( timestr 2023 4 10, "Pâques" )
+                , ( timestr 2023 5 1, "Fête du Travail" )
+                , ( timestr 2023 5 8, "Victoire des Alliés en 1945" )
+                , ( timestr 2023 5 18, "Ascension" )
+                , ( timestr 2023 5 29, "Pentecôte" )
+                , ( timestr 2023 7 14, "Fête nationale" )
+                , ( timestr 2023 8 15, "Assomption" )
+                , ( timestr 2023 11 1, "Toussaint" )
+                , ( timestr 2023 11 11, "Armistice 1918" )
+                , ( timestr 2023 12 25, "Noël" )
+                ]
+          )
+        , ( 2024
+          , Dict.fromList
+                [ ( timestr 2024 1 1, "Jour de l’An" )
+                , ( timestr 2024 4 1, "Pâques" )
+                , ( timestr 2024 5 1, "Fête du Travail" )
+                , ( timestr 2024 5 8, "Victoire des Alliés en 1945" )
+                , ( timestr 2024 5 9, "Ascension" )
+                , ( timestr 2024 5 20, "Pentecôte" )
+                , ( timestr 2024 7 14, "Fête nationale" )
+                , ( timestr 2024 8 15, "Assomption" )
+                , ( timestr 2024 11 1, "Toussaint" )
+                , ( timestr 2024 11 11, "Armistice 1918" )
+                , ( timestr 2024 12 25, "Noël" )
+                ]
+          )
         ]
 
 
