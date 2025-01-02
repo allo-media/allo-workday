@@ -450,6 +450,96 @@ offDays =
                 , ( timestr 2024 12 25, "Noël" )
                 ]
           )
+        , ( 2025
+          , Dict.fromList
+                [ ( timestr 2025 1 1, "Jour de l’An" )
+                , ( timestr 2025 4 21, "Pâques" )
+                , ( timestr 2025 5 1, "Fête du Travail" )
+                , ( timestr 2025 5 8, "Victoire des Alliés en 1945" )
+                , ( timestr 2025 5 29, "Ascension" )
+                , ( timestr 2025 6 9, "Pentecôte" )
+                , ( timestr 2025 7 14, "Fête nationale" )
+                , ( timestr 2025 8 15, "Assomption" )
+                , ( timestr 2025 11 1, "Toussaint" )
+                , ( timestr 2025 11 11, "Armistice 1918" )
+                , ( timestr 2025 12 25, "Noël" )
+                ]
+          )
+        , ( 2026
+          , Dict.fromList
+                [ ( timestr 2026 1 1, "Jour de l’An" )
+                , ( timestr 2026 4 6, "Pâques" )
+                , ( timestr 2026 5 1, "Fête du Travail" )
+                , ( timestr 2026 5 8, "Victoire des Alliés en 1945" )
+                , ( timestr 2026 5 14, "Ascension" )
+                , ( timestr 2026 5 25, "Pentecôte" )
+                , ( timestr 2026 7 14, "Fête nationale" )
+                , ( timestr 2026 8 15, "Assomption" )
+                , ( timestr 2026 11 1, "Toussaint" )
+                , ( timestr 2026 11 11, "Armistice 1918" )
+                , ( timestr 2026 12 25, "Noël" )
+                ]
+          )
+        , ( 2027
+          , Dict.fromList
+                [ ( timestr 2027 1 1, "Jour de l’An" )
+                , ( timestr 2027 3 29, "Pâques" )
+                , ( timestr 2027 5 1, "Fête du Travail" )
+                , ( timestr 2027 5 8, "Victoire des Alliés en 1945" )
+                , ( timestr 2027 5 6, "Ascension" )
+                , ( timestr 2027 5 17, "Pentecôte" )
+                , ( timestr 2027 7 14, "Fête nationale" )
+                , ( timestr 2027 8 15, "Assomption" )
+                , ( timestr 2027 11 1, "Toussaint" )
+                , ( timestr 2027 11 11, "Armistice 1918" )
+                , ( timestr 2027 12 25, "Noël" )
+                ]
+          )
+        , ( 2028
+          , Dict.fromList
+                [ ( timestr 2028 1 1, "Jour de l’An" )
+                , ( timestr 2028 4 17, "Pâques" )
+                , ( timestr 2028 5 1, "Fête du Travail" )
+                , ( timestr 2028 5 8, "Victoire des Alliés en 1945" )
+                , ( timestr 2028 5 25, "Ascension" )
+                , ( timestr 2028 6 5, "Pentecôte" )
+                , ( timestr 2028 7 14, "Fête nationale" )
+                , ( timestr 2028 8 15, "Assomption" )
+                , ( timestr 2028 11 1, "Toussaint" )
+                , ( timestr 2028 11 11, "Armistice 1918" )
+                , ( timestr 2028 12 25, "Noël" )
+                ]
+          )
+        , ( 2029
+          , Dict.fromList
+                [ ( timestr 2029 1 1, "Jour de l’An" )
+                , ( timestr 2029 4 2, "Pâques" )
+                , ( timestr 2029 5 1, "Fête du Travail" )
+                , ( timestr 2029 5 8, "Victoire des Alliés en 1945" )
+                , ( timestr 2029 5 10, "Ascension" )
+                , ( timestr 2029 5 21, "Pentecôte" )
+                , ( timestr 2029 7 14, "Fête nationale" )
+                , ( timestr 2029 8 15, "Assomption" )
+                , ( timestr 2029 11 1, "Toussaint" )
+                , ( timestr 2029 11 11, "Armistice 1918" )
+                , ( timestr 2029 12 25, "Noël" )
+                ]
+          )
+        , ( 2030
+          , Dict.fromList
+                [ ( timestr 2030 1 1, "Jour de l’An" )
+                , ( timestr 2030 4 22, "Pâques" )
+                , ( timestr 2030 5 1, "Fête du Travail" )
+                , ( timestr 2030 5 8, "Victoire des Alliés en 1945" )
+                , ( timestr 2030 5 30, "Ascension" )
+                , ( timestr 2030 6 10, "Pentecôte" )
+                , ( timestr 2030 7 14, "Fête nationale" )
+                , ( timestr 2030 8 15, "Assomption" )
+                , ( timestr 2030 11 1, "Toussaint" )
+                , ( timestr 2030 11 11, "Armistice 1918" )
+                , ( timestr 2030 12 25, "Noël" )
+                ]
+          )
         ]
 
 
